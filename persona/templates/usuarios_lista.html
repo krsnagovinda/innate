@@ -1,0 +1,248 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block titulo %}
+    <title> Staff </title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+    {% if request.user.is_superuser %}
+    <li>
+      <center>
+        <a href="{% url 'class_upload_persona' %}"><button class="btn btn-sm themed-background-modern themed-color-dark"><i class="fa fa-plus"></i> Agregar usuario</button></a>
+    </li>
+    {% endif %}
+    <hr>
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+
+    <li>
+        <a href="{% url 'calendario' %}" ><i class="fa fa-calendar sidebar-nav-icon"></i>Calendario Google</a>
+    </li>
+
+
+
+    <li>
+        <a href="#" class=" sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+                {% endif %}
+            </li>
+
+        </ul>
+    </li>
+
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-stethoscope sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_consulta' %}">Crear Consulta</a>
+                {% endif %}
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="#" class="text-primary sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Staff</span></a>
+        <ul>
+            <li>
+                <a class="active" href="{% url 'class_personas_lista' %}">Archivo de Staff</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_persona' %}">Agregar usuario</a>
+                {% endif %}
+                <a href="{% url 'class_detail_persona' user.id %}">Perfil de Usuario</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+{% block header %}
+<!-- Page content -->
+<div id="page-content">
+  <!-- eCommerce Orders Header -->
+  <div class="content-header themed-background-dark-modern">
+    <ul class="nav-horizontal text-center">
+      <li>
+        <a href="{% url 'panel2' %}" class="themed-background-dark-modern text-light"><i class="fa fa-windows sidebar-nav-icon"></i> Menú Principal</a>
+      </li>
+      <li >
+        <a href="{% url 'pacientes_lista' %}" class="themed-background-dark-modern text-light"><i class="fa fa-wheelchair"></i> Pacientes</a>
+      </li>
+      <li>
+        <a href="{% url 'calendario' %}" class="themed-background-dark-modern text-light" ><i class="fa fa-calendar"></i> Calendario Google</a>
+      </li>
+      <li>
+        <a href="{% url 'class_consulta_lista' %}" class="themed-background-dark-modern text-light" ><i class="fa fa-stethoscope"></i> Consultas</a>
+      </li>
+      <li>
+        <a href="{% url 'class_personas_lista' %}" class="themed-background-dark-modern themed-color-default"><i class="gi gi-group sidebar-nav-icon themed-color-default"></i> Staff</a>
+      </li>
+      <li>
+        <a href="{% url 'admin:login' %}" class="themed-background-dark-modern text-light"><i class="fa fa-cogs"></i> Admin</a>
+      </li>
+      {% if request.user.is_superuser %}
+      <li>
+        <a href="{% url 'class_upload_persona' %}" class="themed-background-dark-modern themed-color-emerald"><i class="themed-color-emerald fa fa-plus-square"></i> Agregar Usuario</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+  <ul class="breadcrumb breadcrumb-top themed-background-modern">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="themed-color-dark-waterlily"><i class="fa fa-home themed-color-dark"></i> Home</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a class="themed-color-dark-waterlily" href="{% url 'panel2' %}"><i class="fa fa-windows themed-color-dark"></i> Menú Principal</a>
+      </li>
+      <li class="breadcrumb-item text-light">
+        <i class="fa fa-group text-light"></i> Staff
+      </li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block mainblock %}
+
+<div class="row">
+<!-- submenu -->
+    <div class="col-sm-12 text-center">
+        
+    <a href="{% url 'class_personas_lista' %}"><button type="button" class="fa fa-group btn btn-lg themed-background-default text-light"> Staff <span class="badge">{{contador}}</span></button></a>
+
+    <a href="{% url 'class_quiro_lista' %}"><button type="button" class="fa fa-ambulance btn btn-lg themed-background-dark-modern text-light"> Quiroprácticos <span class="badge">{{quiro}}</span></button></a>
+
+    <a href="{% url 'class_asistente_lista' %}"><button type="button" class="fa fa-life-ring btn btn-lg themed-background-dark-modern text-light"> Asistentes <span class="badge">{{asistant}}</span></button></a>
+
+    <a href="{% url 'class_radio_lista' %}"><button type="button" class="fa fa-object-group btn btn-lg themed-background-dark-modern text-light"> Radiólogos <span class="badge">{{radio}}</span></button></a>
+
+    <a href="{% url 'class_cap_lista' %}"><button type="button" class="fa fa-graduation-cap btn btn-lg themed-background-dark-modern text-light"> Capacitación <span class="badge">{{cap}}</span></button></a>
+
+    <a href="{% url 'class_conta_lista' %}"><button type="button" class="fa fa-money btn btn-lg themed-background-dark-modern text-light"> Contabilidad <span class="badge">{{conta}}</span></button></a>
+
+    <a href="{% url 'class_admins_lista' %}"><button type="button" class="fa fa-desktop btn  btn-lg themed-background-dark-modern text-light"> Administradores <span class="badge">{{admins}}</span></button></a>        
+                     
+    </div>
+</div>
+    <br>
+
+<!-- END submenu -->
+
+<div class="row">
+<!-- StaffTab -->
+    <div class="tab-pane active" id="staff-tab">        
+        <div class="col-sm-1"></div>
+        <div class="col-sm-10">
+            <div class="block full themed-border-blackberry">
+        {% if personas %}            
+            <div class="pull-right">
+                <form class="form-inline text-right search" action="{% url 'search_results_user'%}" method?='get'>
+                    <input class="form-control mr-xs-4" type="search" name="q" placeholder="Id, Nombre, Apellido, Rol" aria-label="Search">
+                    <button class="btn btn-inline-primary fa fa-search themed-background-modern my-3 my-sm-0" type="submit"> Buscar</button>
+                </form>
+                <br>
+            </div>
+            <table class="table table-bordered table-striped table-vcenter">
+            <thead>
+                <tr>
+                    <th class="text-center themed-color-dark-modern">ID</th>
+                    <th class="text-center themed-color-dark-modern">Nombre</th>
+                    <th class="text-center themed-color-dark-modern">Rol</th>
+                    <th class="text-center themed-color-dark-modern hidden-xs">Foto</th>
+                    <th class="text-center themed-color-dark-modern">Función</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for persona in personas %}
+                <tr>
+                    <td class="text-center">{{persona.id}}</td>
+                    <td class="text-center">{{persona.get_fullname}}</td>
+                    <td class="text-center"><strong>{{persona.Rol}}</strong></td>
+                    <td class="text-center hidden-xs"><a href="{% url 'class_detail_persona' persona.id %}"><img src="{{persona.Foto.url}}" alt="avatar" class="img-circle" height="50" width="50"></a></td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-md">
+                            <a href="{% url 'class_detail_persona' persona.id %}" title="Ver Ficha" class="btn btn-default"><i class="fa fa-eye"></i></a>
+                        </div>
+                        {% if request.user.is_superuser %}
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'class_delete_persona' persona.id %}" title="Eliminar?" class="btn btn-danger"><i class="fa fa-times"></i></a>
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+             <center>
+             <h3>no se han encontrado Usuarios...</h3>
+             <img src="{% static 'website/img/bg-img/gato.png' %}" alt="" style="width:30%;">
+             </center>
+        {% endif %}
+
+        <div class="d-flex flex-row-reverse text-right">
+            {% load navigation_filters %}
+               {% if personas %}
+                    {% if personas.has_other_pages %}
+                       <ul class="pagination pagination-lg">
+                   {% if personas.has_previous %}
+                        <li class="page-item">
+                         <a href="?page={{personas.previous_page_number}}" class="page-link themed-color-night">&laquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                           <a class="page-link ">&laquo;</a>
+                        </li>
+                    {% endif %}
+                    {% for i in personas.paginator.page_range|page_filter:personas %}
+                        {% if personas.number == i %}
+                           <li class="page-item active">
+                             <a class="page-link themed-background-night">{{i}}</a>
+                           </li>
+                        {% else %}
+                           <li class="page-item">
+                             <a href="?page={{i}}" class="page-link themed-color-night themed-background-dark-night">{{i}}</a>
+                           </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if personas.has_next %}
+                         <li class="page-item">
+                           <a href="?page={{personas.next_page_number}}" class="page-link themed-color-night">&raquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                           <a class="page-link">&raquo;</a>
+                        </li>
+                    {% endif %}
+                    </ul>
+                    {% endif %}
+                    {% endif %}
+        </div>
+            </div>
+        </div>
+        <div class="col-sm-1"></div>
+    </div>
+<!-- END StaffTab -->
+
+</div>
+
+
+
+{% endblock %}

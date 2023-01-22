@@ -1,0 +1,277 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+{% load humanize %}
+
+{% block titulo %}
+<title>Datos de Nota-{{notas_extra.id}}</title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+    <li>
+    <center>
+    </li>
+    <hr>
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+
+    <li>
+        <a href="{% url 'calendario' %}" ><i class="fa fa-calendar sidebar-nav-icon"></i>Calendario Google</a>
+    </li>
+
+    <li>
+        <a href="#" class=" sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+                {% endif %}
+            </li>
+
+        </ul>
+    </li>
+
+    <li>
+        <a href="#" class=" text-primary sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_consulta' %}">Nueva Consulta</a>
+                {% endif %}
+                <a class="active">Detalle de Consulta</a>
+            </li>
+
+        </ul>
+    </li>
+     <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Staff</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_personas_lista' %}">Archivo de Staff</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_persona' %}">Agregar usuario</a>
+                {% endif %}
+                <a href="{% url 'class_detail_persona' user.id %}">Perfil de Usuario</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+{% block header %}
+
+<ul class="breadcrumb breadcrumb-top themed-background-night">
+  <li class="breadcrumb-item"><a href="{% url 'home' %}" class="themed-color-dark-waterlily"><i class="fa fa-home themed-color-dark"></i> Home</a></li>
+  <li><a class="themed-color-dark-waterlily" href="{% url 'panel2' %}">Menú Principal</a></li>
+  <li><a class="themed-color-dark-waterlily" href="{% url 'pacientes_lista' %}">Lista pacientes</a></li>
+  <li><a class="themed-color-dark-waterlily" href="{% url 'detalle_paciente' notas_extra.refiere.id %}">Bitácora de Paciente</a></li>
+  <li class="text-light">Detalle de Nota Extra</li>
+</ul>
+{% endblock %}
+
+
+{% block mainblock %}
+{% if request.user.is_superuser %}
+<div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <i class="fa fa-info-circle"></i><a href="javascript:void(0)" class="alert-link"> Puede añadir imágenes a la nota extra con la opción "Añadir Imágenes"</a> !
+</div> 
+{% else %}
+<div class="alert alert-danger">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <i class="fa fa-info-circle"></i><a href="javascript:void(0)" class="alert-link"> No cuenta con permiso para editar nada</a> !
+</div> 
+{% endif %}
+<div class="row">
+<!-- Datos de nota -->
+    <div class="col-lg-4">
+        <div class="block">
+            <div class="block-title themed-background-dark">
+                <h2 class="text-light"><i class="gi gi-book"></i> <strong>Datos</strong> de Nota Extra</h2>
+                {% if request.user.is_superuser %}
+                <div class="block-options pull-right">
+                    <a href="{% url 'class_update_notas_extra' notas_extra.id %}" class="btn btn-sm btn-alt btn-default" data-toggle="tooltip" title="Añadir imágenes"><i class="fa fa-picture-o"></i></a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="block-section text-center">
+                <table class="table table-borderless table-responsive">
+                    <tbody>
+                        <tr>
+                            <td class="text-right"><strong>Id</strong></td>
+                            <td><span class="label label-info">{{notas_extra.id}}</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-right"><strong>Paciente</strong></td>
+                            <td><a href="{% url 'detalle_paciente' notas_extra.refiere.id %}"><span class="label label-info">{{notas_extra.refiere}}-{{notas_extra.refiere.Nombre}} <br>
+                                {{notas_extra.refiere.Apellido_Paterno}} {{notas_extra.refiere.Apellido_Materno}}</span></a></td>
+                        </tr>
+                        <tr>
+                            <td class="text-right"><strong>Nota Creada</strong></td>
+                            <td class="themed-color-autumn">{{notas_extra.creada}}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-right"><strong>Título de Nota</strong></td>
+                            <td class="">{{notas_extra.titulo}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+<!-- END Datos de nota -->
+
+<!-- imagenes de nota -->
+        <div class="block">
+            <div class="block-title themed-background-dark">
+                <h2 class="text-light"><i class="fa fa-picture-o"></i> <strong>Imágenes</strong> de Nota Extra</h2>
+                {% if request.user.is_superuser %}
+                <div class="block-options pull-right">
+                    <a href="{% url 'class_update_notas_extra' notas_extra.id %}" class="btn btn-sm btn-alt btn-default" data-toggle="tooltip" title="Añadir imágenes"><i class="fa fa-pencil"></i></a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="gallery" data-toggle="lightbox-gallery">
+            <div class="row">
+                <div class="row justify-content-center">
+                    {% if notas_extra.imagen_1 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{notas_extra.imagen_1.url}}" class="gallery-link" title="{{notas_extra.imagen_1}}">
+                                <img src="{{notas_extra.imagen_1.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 1</strong>
+                        </div>                                            
+                        </div>
+                    {% endif %}
+                    {% if notas_extra.imagen_2 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{notas_extra.imagen_2.url}}" class="gallery-link" title="{{notas_extra.imagen_2}}">
+                                <img src="{{notas_extra.imagen_2.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 2</strong>
+                        </div>                                            
+                        </div>
+                    {% endif %}
+                    {% if notas_extra.imagen_3 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{notas_extra.imagen_3.url}}" class="gallery-link" title="{{notas_extra.imagen_3}}">
+                                <img src="{{notas_extra.imagen_3.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 3</strong>
+                        </div>                                            
+                        </div>
+                    {% endif %}
+                    {% if notas_extra.imagen_4 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{notas_extra.imagen_4.url}}" class="gallery-link" title="{{notas_extra.imagen_4}}">
+                                <img src="{{notas_extra.imagen_4.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 4</strong>
+                        </div>                                            
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="row justify-content-center">
+                    {% if notas_extra.imagen_5 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{notas_extra.imagen_5.url}}" class="gallery-link" title="{{notas_extra.imagen_5}}">
+                                <img src="{{notas_extra.imagen_5.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 5</strong>
+                        </div>                                            
+                        </div>
+                    {% endif %}
+                    {% if notas_extra.imagen_6 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{notas_extra.imagen_6.url}}" class="gallery-link" title="{{notas_extra.imagen_6}}">
+                                <img src="{{notas_extra.imagen_6.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 6</strong>
+                        </div>                                            
+                        </div>
+                    {% endif %}
+                    {% if notas_extra.imagen_7 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{notas_extra.imagen_7.url}}" class="gallery-link" title="{{notas_extra.imagen_7}}">
+                                <img src="{{notas_extra.imagen_7.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 7</strong>
+                        </div>                                            
+                        </div>
+                    {% endif %}
+                    {% if notas_extra.imagen_8 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{notas_extra.imagen_8.url}}" class="gallery-link" title="{{notas_extra.imagen_8}}">
+                                <img src="{{notas_extra.imagen_8.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 8</strong>
+                        </div>                                            
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="row justify-content-center">
+                    {% if notas_extra.imagen_9 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{notas_extra.imagen_9.url}}" class="gallery-link" title="{{notas_extra.imagen_9}}">
+                                <img src="{{notas_extra.imagen_9.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 9</strong>
+                        </div>                                            
+                        </div>
+                    {% endif %}
+                    {% if notas_extra.imagen_10 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{notas_extra.imagen_10.url}}" class="gallery-link" title="{{notas_extra.imagen_10}}">
+                                <img src="{{notas_extra.imagen_10.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 10</strong>
+                        </div>                                            
+                        </div>
+                    {% endif %}
+                </div>                
+            </div>
+            </div>
+        </div>
+<!-- END imagenes de consuta -->
+    </div>
+
+    <div class="col-lg-8">
+        <div class="block">
+            <div class="block-title themed-background-dark">
+                <h2 class="text-light"><i class="gi gi-book"></i> <strong>Texto</strong> de Nota Extra</h2>               
+            </div>
+            <div class="blog-content">
+                <h5 class="font-weight-bold text-justify mb-2 display-4">{{notas_extra.texto|safe}}</h5>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}

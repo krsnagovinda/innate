@@ -1,0 +1,101 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+{% load humanize %}
+
+{% block titulo %}
+    <title> Eliminar paciente ? </title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+
+    <li>
+        <a href="{% url 'calendario' %}" ><i class="fa fa-calendar sidebar-nav-icon"></i>Calendario Google</a>
+    </li>
+    
+    <li>
+        <a href="#" class=" text-primary sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                <a href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+                <a class="active">Bitácora del Paciente</a>
+            </li>
+
+        </ul>
+    </li>
+    
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-stethoscope sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                <a href="{% url 'class_upload_consulta' %}">Crear Consulta</a>
+            </li>
+
+        </ul>
+    </li>
+   <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Staff</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_personas_lista' %}">Archivo de Staff</a>
+                <a href="{% url 'class_upload_persona' %}">Agregar usuario</a>
+                <a href="{% url 'class_detail_persona' user.id %}">Perfil de Usuario</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+{% block header %}
+<div class="content-header themed-background-dark-night">
+    <div class="header-section">
+        <h1>
+            <i class="gi gi-notes_2 themed-color-night"></i>
+            <h2 class="text-light">{{paciente.Titulo}}. {{paciente.Apellido_Paterno}} {{paciente.Apellido_Materno}} {{paciente.Nombre}}. ( {{paciente.Edad}} años )</h2>
+            <h4 class="text-light">Id: {{paciente.record}}</h4>
+            <small class="text-light">creado: {{paciente.creada|naturaltime}}</small><br>
+            <small class="text-light">Visto por ultima vez: {{paciente.modificada}}</small><br><br>
+            <a href="{% url 'class_update_paciente' paciente.id %}" class="btn themed-background-night text-light">Editar</a> &nbsp; &nbsp;
+            <a href="{% url 'lista_consultas' paciente.id %}" class="btn themed-background-night text-light">Bitácora de Consultas</a>
+        </h1>
+    </div>
+</div>
+{% endblock %}
+
+{% block mainblock %}
+<div class="row">
+    <div class="col-12">
+      <div class="block col-12">
+                      <center><h4 class="">¿Realmente desea eliminar el registro ?</h4>
+                      <form class="form-group" method="post">
+                          <div class="form-group">
+                            {% csrf_token %}
+                          </div>
+                          <div class="form-group">
+                              <center>
+                              <input type="submit" name="Eliminar" value="Si, eliminar" class="btn btn-danger eliminar">
+                              <a  class="btn btn-warning cancelar ml-3" href="{% url 'pacientes_lista' %}">Cancelar</a>
+                              </center>
+                          </div>
+                      </form>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

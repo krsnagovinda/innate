@@ -1,0 +1,1278 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+{% load humanize %}
+{% load qr_code %}
+
+
+{% block titulo %}
+    <title> Detalle de Paciente {{paciente}}</title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+
+    <li>
+        <a href="{% url 'calendario' %}" ><i class="fa fa-calendar sidebar-nav-icon"></i>Calendario Google</a>
+    </li>
+
+    <li>
+        <a href="#" class=" text-primary sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+                {% endif %}
+                <a class="active">Bitácora del Paciente</a>
+            </li>
+
+        </ul>
+    </li>
+
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-stethoscope sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_consulta' %}">Crear Consulta</a>
+                {% endif %}
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Staff</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_personas_lista' %}">Archivo de Staff</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_persona' %}">Agregar usuario</a>
+                {% endif %}
+                <a href="{% url 'class_detail_persona' user.id %}">Perfil de Usuario</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+</ul>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+{% block header %}
+<ul class="breadcrumb breadcrumb-top themed-background-night">
+  <li class="breadcrumb-item"><a href="{% url 'home' %}" class="themed-color-dark-waterlily"><i class="fa fa-home themed-color-dark"></i> Home</a></li>
+  <li><a class="themed-color-dark-waterlily" href="{% url 'panel2' %}">Menú Principal</a></li>
+  <li><a class="themed-color-dark-waterlily" href="{% url 'pacientes_lista' %}">Lista pacientes</a></li>
+  <li><a class="text-light">Bitácora de paciente</a></li>
+</ul>
+{% endblock %}
+
+
+{% block mainblock %}
+
+<!--Pop Up de superuser-->
+{% if request.user.is_superuser %}
+<div class="alert alert-success">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <i class="fa fa-info-circle"></i><a href="javascript:void(0)" class="alert-link"> Puede editar y crear consultas, imágenes, notas, y más </a> !
+</div> 
+{% else %}
+<div class="alert alert-danger">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <i class="fa fa-info-circle"></i><a href="javascript:void(0)" class="alert-link"> No cuenta con permiso para editar o crear nada</a> !
+</div> 
+{% endif %}
+<!--END Pop Up de superuser-->
+
+<div class="row">
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Opciones de Paciente</h4>
+        </div>
+        <div class="modal-body">   
+            {% if request.user.is_superuser %}        
+            <!-- Widget -->
+            <a href="{% url 'class_update_paciente' paciente.id %}" class="widget widget-hover-effect1">
+                <div class="widget-simple">
+                    <div class="widget-icon pull-left themed-background-autumn animation-fadeIn">
+                        <i class="fa fa-pencil"></i>
+                    </div>
+                    <h3 class="widget-content text-right animation-pullDown">
+                        Editar <strong>Perfil</strong><br>                        
+                    </h3>
+                </div>
+            </a>
+            <!-- END Widget -->
+            
+            <!-- Widget -->
+            <a href="{% url 'create_consulta' paciente.id %}" class="widget widget-hover-effect1">
+                <div class="widget-simple">
+                    <div class="widget-icon pull-left themed-background-spring animation-fadeIn">
+                        <i class="fa fa-stethoscope"></i>
+                    </div>
+                    <h3 class="widget-content text-right animation-pullDown">
+                        Crear <strong>Consulta</strong><br>                       
+                    </h3>
+                </div>
+            </a>
+            <!-- END Widget -->
+
+            <!-- Widget -->
+            <a href="{% url 'create_cuaderno' paciente.id %}" class="widget widget-hover-effect1">
+                <div class="widget-simple">
+                    <div class="widget-icon pull-left themed-background-fire animation-fadeIn">
+                        <i class="gi gi-book"></i>
+                    </div>
+                    <h3 class="widget-content text-right animation-pullDown">
+                        Crear <strong>Nota de Evolución</strong><br>                       
+                    </h3>
+                </div>
+            </a>
+            <!-- END Widget -->
+
+            <!-- Widget -->
+            <a href="{% url 'create_notasExtra' paciente.id %}" class="widget widget-hover-effect1">
+                <div class="widget-simple">
+                    <div class="widget-icon pull-left themed-background-amethyst animation-fadeIn">
+                        <i class="fa fa-pencil-square-o"></i>
+                    </div>
+                    <h3 class="widget-content text-right animation-pullDown">
+                        Crear <strong>Nota Extra</strong><br>                       
+                    </h3>
+                </div>
+            </a>
+            <!-- END Widget -->
+            {% endif %}
+            <!-- Widget -->
+            <a href="{% url 'lista_consultas' paciente.id %}" class="widget widget-hover-effect1">
+                <div class="widget-simple">
+                    <div class="widget-icon pull-left themed-background-coral animation-fadeIn">
+                        <i class="gi gi-briefcase"></i>
+                    </div>
+                    <h3 class="widget-content text-right animation-pullDown">
+                        Consultas <strong>Realizadas</strong><br> 
+                        <strong class="badge">{{consultas_count}}</strong>                      
+                    </h3>
+                </div>
+            </a>
+            <!-- END Widget -->
+
+            <!-- Widget -->
+            <a href="{% url 'lista_cuadernos' paciente.id %}" class="widget widget-hover-effect1">
+                <div class="widget-simple">
+                    <div class="widget-icon pull-left themed-background-flatie animation-fadeIn">
+                        <i class="fa fa-file-text"></i>
+                    </div>
+                    <h3 class="widget-content text-right animation-pullDown">
+                        Notas <strong>de Evolución</strong><br> 
+                        <strong class="badge">{{cuadernos_count}}</strong>                      
+                    </h3>
+                </div>
+            </a>
+            <!-- END Widget -->
+
+            <!-- Widget -->
+            <a href="{% url 'lista_notas_extra' paciente.id %}" class="widget widget-hover-effect1">
+                <div class="widget-simple">
+                    <div class="widget-icon pull-left themed-background-night animation-fadeIn">
+                        <i class="fa fa-file-archive-o"></i>
+                    </div>
+                    <h3 class="widget-content text-right animation-pullDown">
+                        Notas <strong>Extra</strong><br> 
+                        <strong class="badge">{{notas_extra_count}}</strong>                      
+                    </h3>
+                </div>
+            </a>
+            <!-- END Widget -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>          
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Termina MODAL -->
+
+
+<!-- Datos personales Card -->
+{% if consultas %}
+<div class="col-lg-4 text-justify">
+        <div class="block">
+            <div class="block-title themed-background-dark">
+                <h2 class="text-light"><i class="fa fa-user"></i> <strong>Datos </strong> Personales</h2>
+                <div class="block-options pull-right ">                    
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn themed-background-default text-light btn-sm" data-toggle="modal" data-target="#myModal"> <i class="fa fa-pencil-square-o"></i>
+                      Opciones 
+                    </button>
+                </div>
+            </div>
+            <div class="block-section text-center">
+                <a href="{{paciente.photo_1.url}}">
+                <img src="{{paciente.photo_1.url}}" alt="avatar" class="img-circle animation-tossing" height="100" width="100">
+                </a>
+                <h3>
+                    <strong>{{paciente.Nombre}}  {{paciente.Apellido_Paterno}} {{paciente.Apellido_Materno}}</strong><br><small></small>
+                    {% qr_from_text link size=8 border=6 %}
+                </h3>
+            </div>           
+            <table class="table table-borderless table-responsive">
+                <tbody>
+                    <tr>
+                        <td class="text-right" style="width: 50%;"><strong>Id</strong></td>
+                        <td><span class="label label-primary">{{paciente.record}}</span></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right"><strong>Perfil Creado</strong></td>
+                        <td class="themed-color-autumn">{{paciente.creada|naturaltime}} - {{paciente.creada}}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-right"><strong>Última Visita</strong></td>
+                        <td class="themed-color-autumn">{{paciente.modificada}}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-right"><a class="themed-color-flatie" href="{% url 'lista_consultas' paciente.id %}"><strong>Consultas realizadas</strong></a></td>
+                        <td><a href="{% url 'lista_consultas' paciente.id %}"><span class="label label-success">{{consultas_count}}</span></a></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right"><a class="themed-color-flatie" href="{% url 'lista_cuadernos' paciente.id %}"><strong>Notas de Evolución</strong></a></td>
+                        <td><a class="themed-color-night" href="{% url 'lista_cuadernos' paciente.id %}"><span class="label label-info">{{cuadernos_count}}</span></a></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right"><a class="themed-color-flatie" href="{% url 'lista_notas_extra' paciente.id %}"><strong>Notas Extra</strong></a></td>
+                        <td><a class="themed-color-night" href="{% url 'lista_notas_extra' paciente.id %}"><span class="label themed-background-dark-waterlily">{{notas_extra_count}}</span></a></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right"><strong>Título</strong></td>
+                        <td>{{paciente.Titulo}}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-right"><strong>Edad</strong></td>
+                        <td>{{ paciente.calculo_edad}}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-right"><strong>Fecha de Nacimiento</strong></td>
+                        <td>{{paciente.Fecha_Nacimiento}}</td>
+                    </tr>
+                    <tr>
+                        {% if paciente.Domicilio %}
+                        <td class="text-right"><strong>Domicilio</strong></td>
+                        <td>{{paciente.Domicilio|safe}}</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        {% if paciente.Ciudad %}
+                        <td class="text-right"><strong>Ciudad</strong></td>
+                        <td>{{paciente.Ciudad}}</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        {% if paciente.Telefono %}
+                        <td class="text-right"><i class="fa fa-phone"></i></td><td>{{paciente.Telefono}}</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        {% if paciente.Email %}
+                        <td class="text-right"><i class="fa fa-envelope-o"></i></td><td>{{paciente.Email}}</td>
+                        {% endif %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+<!-- datos personales end -->        
+
+
+<!-- Datos Ultima nota evo-->
+{% if cuadernos %}
+<div class="block">
+    <div class="block-title themed-background-dark">
+        <h2 class="text-light"><i class="fa fa-user"></i> <strong>Datos</strong> última Nota de Evolución</h2>               
+    </div>
+    {% for cuaderno in cuadernos %}
+    
+    <table class="table table-borderless table-responsive">
+        <tr>
+            {% if cuaderno.estatura %}
+            <td class="text-right" ><strong>Estatura</strong></td>
+            <td><span class="text-right">{{cuaderno.estatura}} cm</span></td>
+            {% endif  %}
+        </tr>
+        <tr>
+            {% if cuaderno.peso %}
+            <td class="text-right" ><strong>Peso</strong></td>
+            <td><span class="text-right">{{cuaderno.peso}} Kg</span></td>
+            {% endif  %}
+        </tr>
+        <tr>
+            {% if cuaderno.presion  %}
+            <td class="text-right" ><strong>Presión Sanguinea</strong></td>
+            <td><span class="text-right">{{cuaderno.presion}} MM/Hg</span></td>
+            {% endif  %}
+        </tr>
+        <tr>
+            {% if cuaderno.temperatura  %}
+            <td class="text-right" ><strong>Temperatura</strong></td>
+            <td><span class="text-right">{{cuaderno.temperatura}} ºc</span></td>
+            {% endif  %}
+        </tr>
+    </table>
+    {% endfor %}
+</div>
+{% endif %}
+</div>
+<!-- End datos nota evo-->
+{% else %}
+
+<div class="col-lg-2"></div>
+<div class="col-lg-8 text-justify">
+    <div class="block">
+        <div class="block-title themed-background-dark">
+            <h2 class="text-light"><i class="fa fa-user"></i> <strong>Datos </strong> Personales</h2>
+            <div class="block-options pull-right ">                    
+                <!-- Button trigger modal -->
+                <button type="button" class="btn themed-background-default text-light btn-sm" data-toggle="modal" data-target="#myModal"> <i class="fa fa-pencil-square-o"></i>
+                  Opciones 
+                </button>
+            </div>
+        </div>
+        <div class="block-section text-center">
+            <a href="{{paciente.photo_1.url}}">
+            <img src="{{paciente.photo_1.url}}" alt="avatar" class="img-circle animation-tossing" height="100" width="100">
+            </a>
+            <h3>
+                <strong>{{paciente.Nombre}}  {{paciente.Apellido_Paterno}} {{paciente.Apellido_Materno}}</strong><br><small></small>
+                {% qr_from_text link size=8 border=6 %}
+            </h3>
+        </div>           
+        <table class="table table-borderless table-responsive">
+            <tbody>
+                <tr>
+                    <td class="text-right" style="width: 50%;"><strong>Id</strong></td>
+                    <td><span class="label label-primary">{{paciente.record}}</span></td>
+                </tr>
+                <tr>
+                    <td class="text-right"><strong>Perfil Creado</strong></td>
+                    <td class="themed-color-autumn">{{paciente.creada|naturaltime}} - {{paciente.creada}}</td>
+                </tr>
+                <tr>
+                    <td class="text-right"><strong>Última Visita</strong></td>
+                    <td class="themed-color-autumn">{{paciente.modificada}}</td>
+                </tr>
+                <tr>
+                    <td class="text-right"><a class="themed-color-flatie" href="{% url 'lista_consultas' paciente.id %}"><strong>Consultas realizadas</strong></a></td>
+                    <td><a href="{% url 'lista_consultas' paciente.id %}"><span class="label label-success">{{consultas_count}}</span></a></td>
+                </tr>
+                <tr>
+                    <td class="text-right"><a class="themed-color-flatie" href="{% url 'lista_cuadernos' paciente.id %}"><strong>Notas de Evolución</strong></a></td>
+                    <td><a class="themed-color-night" href="{% url 'lista_cuadernos' paciente.id %}"><span class="label label-info">{{cuadernos_count}}</span></a></td>
+                </tr>
+                <tr>
+                    <td class="text-right"><a class="themed-color-flatie" href="{% url 'lista_notas_extra' paciente.id %}"><strong>Notas Extra</strong></a></td>
+                    <td><a class="themed-color-night" href="{% url 'lista_notas_extra' paciente.id %}"><span class="label themed-background-dark-waterlily">{{notas_extra_count}}</span></a></td>
+                </tr>
+                <tr>
+                    <td class="text-right"><strong>Título</strong></td>
+                    <td>{{paciente.Titulo}}</td>
+                </tr>
+                <tr>
+                    <td class="text-right"><strong>Edad</strong></td>
+                    <td>{{ paciente.calculo_edad}}</td>
+                </tr>
+                <tr>
+                    <td class="text-right"><strong>Fecha de Nacimiento</strong></td>
+                    <td>{{paciente.Fecha_Nacimiento}}</td>
+                </tr>
+                <tr>
+                    {% if paciente.Domicilio %}
+                    <td class="text-right"><strong>Domicilio</strong></td>
+                    <td>{{paciente.Domicilio|safe}}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    {% if paciente.Ciudad %}
+                    <td class="text-right"><strong>Ciudad</strong></td>
+                    <td>{{paciente.Ciudad}}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    {% if paciente.Telefono %}
+                    <td class="text-right"><i class="fa fa-phone"></i></td><td>{{paciente.Telefono}}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    {% if paciente.Email %}
+                    <td class="text-right"><i class="fa fa-envelope-o"></i></td><td>{{paciente.Email}}</td>
+                    {% endif %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+<!-- datos personales end -->
+
+<!-- Datos Ultima nota evo-->
+{% if cuadernos %}
+<div class="block">
+<div class="block-title themed-background-dark">
+    <h2 class="text-light"><i class="fa fa-user"></i> <strong>Datos</strong> última Nota de Evolución</h2>               
+</div>
+{% for cuaderno in cuadernos %}
+<table class="table table-borderless table-responsive">
+    <tr>
+        <td class="text-right" ><strong>Estatura</strong></td>
+        <td><span class="text-right">{{cuaderno.estatura}} cm</span></td>
+    </tr>
+    <tr>
+        <td class="text-right" ><strong>Peso</strong></td>
+        <td><span class="text-right">{{cuaderno.peso}} Kg</span></td>
+    </tr>
+    <tr>
+        <td class="text-right" ><strong>Presión Sanguinea</strong></td>
+        <td><span class="text-right">{{cuaderno.presion}} MM/Hg</span></td>
+    </tr>
+    <tr>
+        <td class="text-right" ><strong>Temperatura</strong></td>
+        <td><span class="text-right">{{cuaderno.temperatura}} ºc</span></td>
+    </tr>
+</table>
+{% endfor %}
+</div>
+{% endif %}
+</div>
+{% endif %}
+<!-- END datos personales general -->
+
+<!-- últimas consultas -->
+{% if consultas %}
+<div class="col-lg-8">
+        <div class="block">
+            <div class="block-title themed-background-dark">
+                <h2 class="text-light"><i class="fa fa-stethoscope"></i> <strong>Resumen</strong> última Consulta</h2>                
+            </div>
+            <table class="table table-borderless table-responsive">
+                <thead>
+                    <th class="text-center themed-color-autumn"><h4>Id</h4></th>
+                    <th class="text-center themed-color-autumn"><h4>Sesión</h4></th>                    
+                    <th class="text-center themed-color-autumn"><h4>Fecha</h4></th>
+                    <th class="text-center themed-color-autumn hidden-xs"><h4>Atendió</h4></th>
+                    <th class="text-center themed-color-autumn"><h4>Abrir</h4>  </th>
+                </thead>
+                <tbody>
+        {% for consultas in consultas %}
+                    <tr>
+                        <td class="text-center"><strong>{{consultas.id}}</strong></td>
+                        <td class="text-center"><strong>{{consultas.sesion}}</strong></td>                        
+                        <td class="text-center ">{{consultas.creada}}</td>
+                        <td class="text-center hidden-xs">{{consultas.atiende}}</td>
+                        <td class="text-center">
+                        <div class="btn-group btn-group-md">
+                            <a href="{% url 'class_consulta_detail' consultas.id %}" title="Ver Ficha" class="btn btn-default"><i class="fa fa-eye"></i></a>
+                        </div>
+                        </td>
+                    </tr>
+        {% endfor %}
+    </tbody>
+            </table>  
+            <table class="table table-borderless table-responsive">
+                {% for consulta in consultas %}
+                <thead>
+                    {% if consulta.Padecimiento_actual %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Padecimiento Actual</h4></td>
+                        <td><h5>{{consulta.Padecimiento_actual|safe}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.Ajuste_de_hoy %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Ajuste de Hoy</h4></td>
+                        <td><h5>{{consulta.Ajuste_de_hoy|safe}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.general %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Columna General</h4></td>
+                        <td><h5>{{consulta.general}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.cervical %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Cervical</h4></td>
+                        <td><h5>{{consulta.cervical}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.toraxica %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Toráxica</h4></td>
+                        <td><h5>{{consulta.toraxica}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.lumbo_sacra %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Lumbo Sacra</h4></td>
+                        <td><h5>{{consulta.lumbo_sacra}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.sacro_iliaco %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Sacro Iliaco</h4></td>
+                        <td><h5>{{consulta.sacro_iliaco}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.coccix %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Coccix</h4></td>
+                        <td><h5>{{consulta.coccix}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.pelvis_cadera %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Pelvis - Cadera</h4></td>
+                        <td><h5>{{consulta.pelvis_cadera}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.curvatura %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Curvatura</h4></td>
+                        <td><h5>{{consulta.curvatura}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.cefaleas %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Cefaleas</h4></td>
+                        <td><h5>{{consulta.cefaleas}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.hombro %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Hombro</h4></td>
+                        <td><h5>{{consulta.hombro}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.codo_a_mano %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Codo a Mano</h4></td>
+                        <td><h5>{{consulta.codo_a_mano}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.rodilla %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Rodilla</h4></td>
+                        <td><h5>{{consulta.rodilla}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.pronostico %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Pronóstico</h4></td>
+                        <td><h5>{{consulta.pronostico}}</h5></td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.notas %}
+                    <tr>
+                        <td class="text-justify themed-color-autumn"><h4>Notas</h4></td>
+                        <td><h5>{{consulta.notas|safe}}</h5></td>
+                    </tr>
+                    {% endif %}
+                </thead>
+                
+                {% endfor %}                                
+            </table>            
+        </div>
+</div>
+<!--  end últimas consultas -->
+
+<!--galeria de consulta-->
+<div class="col-lg-8">
+<div class="block">
+    <div class="block-title themed-background-dark">
+        <h2 class="text-light"><i class="fa fa-picture-o"></i> <strong>Imágenes</strong> última Consulta</h2>               
+    </div>
+    <div class="gallery" data-toggle="lightbox-gallery">
+        <div class="row">
+            {% for consulta in consultas %}           
+            <div class="row justify-content-center">
+
+                {% if consulta.transoral_neutra %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.transoral_neutra.url}}" class="gallery-link" title="{{consulta.transoral_neutra}}">
+                        <img src="{{consulta.transoral_neutra.url}}" alt="transoral neutra" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Transoral Neutra</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.transoral_dinamica_derecha %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.transoral_dinamica_derecha.url}}" class="gallery-link" title="{{consulta.transoral_dinamica_derecha}}">
+                        <img src="{{consulta.transoral_dinamica_derecha.url}}" alt="transoral dinamica derecha" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Transoral Dinámica Derecha</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.transoral_dinamica_izquierda %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.transoral_dinamica_izquierda.url}}" class="gallery-link" title="{{consulta.transoral_dinamica_izquierda}}">
+                        <img src="{{consulta.transoral_dinamica_izquierda.url}}" alt="transoral dinamica izquierda" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Transoral Dinámica Izquierda</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.AP_cervical %}
+                <div class=" col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.AP_cervical.url}}" class="gallery-link" title="{{consulta.AP_cervical}}">
+                        <img src="{{consulta.AP_cervical.url}}" alt="AP cervical" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>AP Cervical</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <div class="row justify-content-center">
+                
+                {% if consulta.AP_toraxica %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.AP_toraxica.url}}" class="gallery-link" title="{{consulta.AP_toraxica}}">
+                        <img src="{{consulta.AP_toraxica.url}}" alt="AP toraxica" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>AP Toráxica</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.AP_lumbopelvica %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.AP_lumbopelvica.url}}" class="gallery-link" title="{{consulta.AP_lumbopelvica}}">
+                        <img src="{{consulta.AP_lumbopelvica.url}}" alt="AP lumbopelvica" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>AP Lumbo Pélvica</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.lateral_cervical %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.lateral_cervical.url}}" class="gallery-link" title="{{consulta.lateral_cervical}}">
+                        <img src="{{consulta.lateral_cervical.url}}" alt="lateral cervical" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Lateral Cervical</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.lateral_toraxica %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.lateral_toraxica.url}}" class="gallery-link" title="{{consulta.lateral_toraxica}}">
+                        <img src="{{consulta.lateral_toraxica.url}}" alt="lateral toraxica" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Lateral Toráxica</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <div class="row justify-content-center">
+
+                {% if consulta.lateral_lumbopelvica %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.lateral_lumbopelvica.url}}" class="gallery-link" title="{{consulta.lateral_lumbopelvica}}">
+                        <img src="{{consulta.lateral_lumbopelvica.url}}" alt="lateral lumbopelvica" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Lateral Lumbo Pélvica</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.cervical_extension %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.cervical_extension.url}}" class="gallery-link" title="{{consulta.cervical_extension}}">
+                        <img src="{{consulta.cervical_extension.url}}" alt="cervical extension" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Cervical Extensión</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.cervical_flexion %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.cervical_flexion.url}}" class="gallery-link" title="{{consulta.cervical_flexion}}">
+                        <img src="{{consulta.cervical_flexion.url}}" alt="cervical flexion" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Cervical Flexión</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.stitch_AP %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.stitch_AP.url}}" class="gallery-link" title="{{consulta.stitch_AP}}">
+                        <img src="{{consulta.stitch_AP.url}}" alt="stitch AP" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Stitch AP</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+           
+            <div class="row justify-content-center">
+
+                {% if consulta.stitch_lateral %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.stitch_lateral.url}}" class="gallery-link" title="{{consulta.stitch_lateral}}">
+                        <img src="{{consulta.stitch_lateral.url}}" alt="stitch lateral" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Stitch Lateral</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.posturometria_frente %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.posturometria_frente.url}}" class="gallery-link" title="{{consulta.posturometria_frente}}">
+                        <img src="{{consulta.posturometria_frente.url}}" alt="posturometria_frente" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Posturometría Frente</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.posturometria_lateral %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.posturometria_lateral.url}}" class="gallery-link" title="{{consulta.posturometria_lateral}}">
+                        <img src="{{consulta.posturometria_lateral.url}}" alt="posturometria_lateral" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Posturometría Lateral</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.posturometria_posterior %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.posturometria_posterior.url}}" class="gallery-link" title="{{consulta.posturometria_posterior}}">
+                        <img src="{{consulta.posturometria_posterior.url}}" alt="posturometria_posterior" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Posturometría Posterior</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <div class="row justify-content-center">
+                
+                {% if consulta.scanner %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.scanner.url}}" class="gallery-link" title="{{consulta.scanner}}">
+                        <img src="{{consulta.scanner.url}}" alt="scanner" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Scanner</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.extra_1 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.extra_1.url}}" class="gallery-link" title="{{consulta.extra_1}}">
+                        <img src="{{consulta.extra_1.url}}" alt="" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Extra 1</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.extra_2 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.extra_2.url}}" class="gallery-link" title="{{consulta.extra_2}}">
+                        <img src="{{consulta.extra_2.url}}" alt="" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Extra 2</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if consulta.foto %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{consulta.foto.url}}" class="gallery-link" title="{{consulta.foto}}">
+                        <img src="{{consulta.foto.url}}" alt="" class="img-fluid img-rounded" style=" overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Foto</strong>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            {% endfor %}        
+        </div>
+    </div>    
+</div>
+</div>
+{% endif %}
+<!--galeria consulta END-->
+
+
+<!--  ultimas nota evolucion-->
+{% if cuadernos %}
+<div class="col-lg-12">
+    <div class="block">
+        <div class="block-title themed-background-dark">
+            <h2 class="text-light"><i class="gi gi-book"></i> <strong>Resumen</strong> última Nota de Evolución</h2>     
+        </div>
+            <table class="table table-borderless table-responsive">
+                <thead>
+                    <th class="text-center themed-color-fancy"><h4>Id</h4></th>
+                    <th class="text-center themed-color-fancy"><h4>Título</h4></th>                    
+                    <th class="text-center themed-color-fancy"><h4>Fecha</h4></th>
+                    <th class="text-center themed-color-fancy"><h4>Abrir</h4></th>
+                </thead>
+                <tbody>
+        {% for cuaderno in cuadernos %}
+                    <tr>
+                        <td class="text-center"><strong>{{cuaderno.id}}</strong></td>
+                        <td class="text-center"><strong>{{cuaderno.titulo}}</strong></td>                        
+                        <td class="text-center ">{{cuaderno.creada}}</td>
+                        <td class="text-center">
+                        <div class="btn-group btn-group-md">
+                            <a href="{% url 'class_cuaderno_detail' cuaderno.id %}" title="Ver Ficha" class="btn btn-default"><i class="fa fa-eye"></i></a>
+                        </div>
+                        </td>
+                    </tr>
+        {% endfor %}
+                </tbody>
+            </table>
+            {% for cuaderno in cuadernos %}            
+            <table class="table table-borderless table-responsive"> 
+                {% if cuaderno.estudios %}              
+                <thead>
+                    <tr>
+                        <th class="themed-color-fancy"><h4>Estudios</h4></th>                                       
+                    </tr>
+                </thead>    
+                <tbody>
+                                 
+                        <td class="text-justify"><h5>{{cuaderno.estudios}}</h5></td>                    
+                
+                </tbody>
+                {% endif %}
+                
+                {% if cuaderno.exploracion %}
+                <thead>
+                    <tr>
+                        <th class="themed-color-fancy"><h4>Exploración</h4></th>                                       
+                    </tr>
+                </thead>    
+                <tbody>
+                                   
+                        <td class="text-justify"><h5>{{cuaderno.exploracion}}</h5></td>                    
+                
+                </tbody>
+                {% endif %}
+
+                {% if cuaderno.interrogarorio %}
+                <thead>
+                    <tr>
+                        <th class="themed-color-fancy"><h4>Interrogatorio</h4></th>                                       
+                    </tr>
+                </thead>    
+                <tbody>
+                
+                        <td class="text-justify"><h5>{{cuaderno.interrogatorio}}</h5></td>                    
+                
+                </tbody>
+                {% endif %}
+
+                {% if cuaderno.toxicologico %}
+                <thead>
+                    <tr>
+                        <th class="themed-color-fancy"><h4>Exámen Toxicológico</h4></th>                                       
+                    </tr>
+                </thead>    
+                <tbody>
+                
+                        <td class="text-justify"><h5>{{cuaderno.toxicologico}}</h5></td>                    
+                
+                </tbody>
+                {% endif %}
+
+                {% if cuaderno.texto %}
+                <thead>
+                    <tr>
+                        <th class="themed-color-fancy"><h4>Texto</h4></th>                                       
+                    </tr>
+                </thead>    
+                <tbody>
+                
+                        <td class="text-justify"><h5>{{cuaderno.texto|safe}}</h5></td>                    
+                {% endif %}
+                {% endfor %}
+                </tbody>
+                
+            </table>          
+       </div>
+</div>
+{% endif %}
+<!--  end últimas nota evolucion -->
+
+<!--galeria notas evolucion-->
+{% if cuadernos %}
+<div class="col-lg-12">
+    <div class="block">
+        <div class="block-title themed-background-dark">
+            <h2 class="text-light"><i class="fa fa-picture-o"></i> <strong>Imágenes</strong> última Nota de Evolución</h2>               
+        </div>
+        <div class="gallery" data-toggle="lightbox-gallery">
+            <div class="row">
+                {% for cuaderno in cuadernos %}
+
+                <div class="row justify-content-center">
+                
+                {% if cuaderno.imagen_1 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{cuaderno.imagen_1.url}}" class="gallery-link" title="{{cuaderno.imagen_1}}">
+                        <img src="{{cuaderno.imagen_1.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 1</strong>
+                    </div>
+                </div>
+                {% endif %}
+                {% if cuaderno.imagen_2 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{cuaderno.imagen_2.url}}" class="gallery-link" title="{{cuaderno.imagen_2}}">
+                        <img src="{{cuaderno.imagen_2.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 2</strong>
+                    </div>
+                </div>
+                {% endif %}
+                {% if cuaderno.imagen_3 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{cuaderno.imagen_3.url}}" class="gallery-link" title="{{cuaderno.imagen_3}}">
+                        <img src="{{cuaderno.imagen_3.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 3</strong>
+                    </div>
+                </div>
+                {% endif %}
+                {% if cuaderno.imagen_4 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{cuaderno.imagen_4.url}}" class="gallery-link" title="{{cuaderno.imagen_4}}">
+                        <img src="{{cuaderno.imagen_4.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 4</strong>
+                    </div>
+                </div>
+                {% endif %}
+                </div>
+
+                <div class="row justify-content-center">
+                
+                    {% if cuaderno.imagen_5 %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{cuaderno.imagen_5.url}}" class="gallery-link" title="{{cuaderno.imagen_5}}">
+                            <img src="{{cuaderno.imagen_5.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 5</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if cuaderno.imagen_6 %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{cuaderno.imagen_6.url}}" class="gallery-link" title="{{cuaderno.imagen_6}}">
+                            <img src="{{cuaderno.imagen_6.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 6</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if cuaderno.imagen_7 %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{cuaderno.imagen_7.url}}" class="gallery-link" title="{{cuaderno.imagen_7}}">
+                            <img src="{{cuaderno.imagen_7.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 7</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if cuaderno.imagen_8 %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{cuaderno.imagen_8.url}}" class="gallery-link" title="{{cuaderno.imagen_8}}">
+                            <img src="{{cuaderno.imagen_8.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 8</strong>
+                        </div>
+                    </div>
+                    {% endif %}    
+                    </div>
+
+                    <div class="row justify-content-center">
+                
+                        {% if cuaderno.imagen_9 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{cuaderno.imagen_9.url}}" class="gallery-link" title="{{cuaderno.imagen_9}}">
+                                <img src="{{cuaderno.imagen_9.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                            <div class="caption hidden-xs text-center">
+                                <strong>Imágen 9</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if cuaderno.imagen_10 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{cuaderno.imagen_10.url}}" class="gallery-link" title="{{cuaderno.imagen_10}}">
+                                <img src="{{cuaderno.imagen_10.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                            <div class="caption hidden-xs text-center">
+                                <strong>Imágen 10</strong>
+                            </div>
+                        </div>
+                        {% endif %}                        
+                        </div>
+
+                {% endfor %}  
+            </div>
+        </div>   
+        
+    </div>
+
+</div>
+{% endif %}
+<!--END galeria notas evolucion-->
+
+
+<!-- Notas extra -->
+{% if notas_extra %}
+ <div class="col-lg-12"> 
+
+    <div class="block">
+        <div class="block-title themed-background-dark">
+            <h2 class="text-light"><i class="gi gi-book"></i> <strong>Resumen</strong> última Nota Extra</h2>     
+        </div>
+            <table class="table table-borderless table-responsive">
+                <thead>
+                    <th class="text-center themed-color-flatie"><h4>Id</h4></th>
+                    <th class="text-center themed-color-flatie"><h4>Título</h4></th>                    
+                    <th class="text-center themed-color-flatie"><h4>Fecha</h4></th>
+                    <th class="text-center themed-color-flatie"><h4>Abrir</h4></th>
+                </thead>
+                <tbody>
+            {% for x in notas_extra %}
+                    <tr>
+                        <td class="text-center"><strong>{{x.id}}</strong></td>
+                        <td class="text-center"><strong>{{x.titulo}}</strong></td>                        
+                        <td class="text-center ">{{x.creada}}</td>
+                        <td class="text-center">
+                        <div class="btn-group btn-group-md">
+                            <a href="{% url 'class_notas_extra_detail' x.id %}" title="Ver Ficha" class="btn btn-default"><i class="fa fa-eye"></i></a>
+                        </div>
+                        </td>
+                    </tr>
+                   
+              </tbody>
+            </table>
+
+            <table class="table table-borderless table-responsive">               
+            <thead>
+                <tr>
+                    <th class="themed-color-flatie"><h4>Texto</h4></th>                                       
+                </tr>
+            </thead>    
+            <tbody>
+                                
+                    <td class="text-justify"><h5>{{x.texto|safe}}</h5></td>                    
+            {% endfor %}
+            </tbody>
+            </table>            
+        </div>
+ </div>
+<!-- END notas extra -->
+
+<!--galeria notas extra-->
+<div class="col-lg-12"> 
+
+    <div class="block">
+        <div class="block-title themed-background-dark">
+            <h2 class="text-light"><i class="fa fa-picture-o"></i> <strong>Imágenes</strong> última Nota Extra</h2>               
+        </div>
+        <div class="gallery" data-toggle="lightbox-gallery">
+            <div class="row">
+                {% for notas_extra in notas_extra %}
+
+                <div class="row justify-content-center">
+                
+                {% if notas_extra.imagen_1 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{notas_extra.imagen_1.url}}" class="gallery-link" title="{{notas_extra.imagen_1}}">
+                        <img src="{{notas_extra.imagen_1.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 1</strong>
+                    </div>
+                </div>
+                {% endif %}
+                {% if notas_extra.imagen_2%}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{notas_extra.imagen_2.url}}" class="gallery-link" title="{{notas_extra.imagen_2}}">
+                        <img src="{{notas_extra.imagen_2.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 2</strong>
+                    </div>
+                </div>
+                {% endif %}
+                {% if notas_extra.imagen_3 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{notas_extra.imagen_3.url}}" class="gallery-link" title="{{notas_extra.imagen_3}}">
+                        <img src="{{notas_extra.imagen_3.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 3</strong>
+                    </div>
+                </div>
+                {% endif %}
+                {% if notas_extra.imagen_4 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{notas_extra.imagen_4.url}}" class="gallery-link" title="{{notas_extra.imagen_4}}">
+                        <img src="{{notas_extra.imagen_4.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 4</strong>
+                    </div>
+                </div>
+                {% endif %}
+                </div>
+
+                <div class="row justify-content-center">
+                    
+                    {% if notas_extra.imagen_5 %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{notas_extra.imagen_5.url}}" class="gallery-link" title="{{notas_extra.imagen_5}}">
+                            <img src="{{notas_extra.imagen_5.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 5</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if notas_extra.imagen_6 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{notas_extra.imagen_6.url}}" class="gallery-link" title="{{notas_extra.imagen_6}}">
+                        <img src="{{notas_extra.imagen_6.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 6</strong>
+                    </div>
+                </div>
+                {% endif %}
+                {% if notas_extra.imagen_7 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{notas_extra.imagen_7.url}}" class="gallery-link" title="{{notas_extra.imagen_7}}">
+                        <img src="{{notas_extra.imagen_7.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 7</strong>
+                    </div>
+                </div>
+                {% endif %}
+                {% if notas_extra.imagen_8 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{notas_extra.imagen_8.url}}" class="gallery-link" title="{{notas_extra.imagen_8}}">
+                        <img src="{{notas_extra.imagen_8.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 8</strong>
+                    </div>
+                </div>
+                {% endif %}
+                </div>
+
+                <div class="row justify-content-center">
+                    {% if notas_extra.imagen_9 %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{notas_extra.imagen_9.url}}" class="gallery-link" title="{{notas_extra.imagen_9}}">
+                            <img src="{{notas_extra.imagen_9.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Imágen 9</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if notas_extra.imagen_10 %}
+                <div class="col-12 col-md-4 col-lg-3">
+                    <a href="{{notas_extra.imagen_10.url}}" class="gallery-link" title="{{notas_extra.imagen_10}}">
+                        <img src="{{notas_extra.imagen_10.url}}" alt="" class="img-fluid img-rounded" style="overflow: hidden;">
+                    </a>
+                    <div class="caption hidden-xs text-center">
+                        <strong>Imágen 10</strong>
+                    </div>
+                </div>
+                {% endif %}
+                </div>
+
+                {% endfor %}
+            </div>
+        </div>
+    </div>    
+</div>
+<!--END galeria notas extra-->
+</div>
+{% endif %}
+{% endblock %}
+
+<script src="js/vendor/jquery.min.js"></script>
+<script src="js/vendor/bootstrap.min.js"></script>
+<script src="js/plugins.js"></script>
+<script src="js/app.js"></script>
+<script src='https://code.jquery.com/jquery-3.5.1.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.4.4/umd/popper.min.js'></script>

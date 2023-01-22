@@ -1,0 +1,42 @@
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    <title> Detalle de Clínica </title>
+{% endblock %}
+
+{% block content %}
+
+<section>
+    <div class="container-fluid ">
+      <div class="row mb-5 px-5">
+        <div class="col-xl-10 col-lg-9 col-md-8 ml-auto">
+          <div class="row">
+            <div class="col-12">
+              <h2 class="text-muted text-center mb-4">Datos de Clínica</h2>
+
+              <div class="row">
+                <div class="container jumbotron col-10">
+
+                          <form method="post">
+							<p class="text-center asterisco mb-5">Los campos marcados con *, son obligatorios</p>
+                              {% csrf_token %}
+                              {{ form.media }}
+                              {{ form|crispy}}
+							<br>
+							<div class="col-7 mx-auto">
+							    <input type="submit" value="Guardar" class="btn btn-primary btn-lg btn-block">
+					        </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+</section>
+
+
+{% endblock %}

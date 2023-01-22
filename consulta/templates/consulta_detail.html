@@ -1,0 +1,520 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+{% load humanize %}
+
+{% block titulo %}
+<title>Datos de consulta-{{consulta.id}}</title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+    <li>
+    <center>
+        
+    </li>
+    <hr>
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+
+    <li>
+        <a href="{% url 'calendario' %}" ><i class="fa fa-calendar sidebar-nav-icon"></i>Calendario Google</a>
+    </li>
+
+    <li>
+        <a href="#" class=" sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+                {% endif %}
+            </li>
+
+        </ul>
+    </li>
+
+    <li>
+        <a href="#" class=" text-primary sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_consulta' %}">Nueva Consulta</a>
+                {% endif %}
+                <a class="active">Detalle de Consulta</a>
+            </li>
+
+        </ul>
+    </li>
+     <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Staff</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_personas_lista' %}">Archivo de Staff</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_persona' %}">Agregar usuario</a>
+                {% endif %}
+                <a href="{% url 'class_detail_persona' user.id %}">Perfil de Usuario</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+{% block header %}
+<ul class="breadcrumb breadcrumb-top themed-background-night">
+  <li class="breadcrumb-item"><a href="{% url 'home' %}" class="themed-color-dark-waterlily"><i class="fa fa-home themed-color-dark"></i> Home</a></li>
+  <li><a class="themed-color-dark-waterlily" href="{% url 'panel2' %}">Menú Principal</a></li>
+  <li><a class="themed-color-dark-waterlily" href="{% url 'pacientes_lista' %}">Lista pacientes</a></li>
+  <li><a class="themed-color-dark-waterlily" href="{% url 'detalle_paciente' consulta.pertenece.id %}">Bitácora de Paciente</a></li>    
+  <li class="text-light">Detalle de consulta</li>
+</ul>
+{% endblock %}
+
+
+{% block mainblock %}
+
+{% if request.user.is_superuser %}
+<div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <i class="fa fa-info-circle"></i><a href="javascript:void(0)" class="alert-link"> Puede añadir imágenes a la consulta con la opción "Editar Consulta"</a> !
+</div> 
+{% else %}
+<div class="alert alert-danger">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <i class="fa fa-info-circle"></i><a href="javascript:void(0)" class="alert-link"> No cuenta con permiso para editar nada</a> !
+</div> 
+{% endif %}
+    
+
+<div class="row">
+<!-- Datos de consuta -->    
+    <div class="col-lg-4 text-justify">
+        <div class="block">
+            <div class="block-title themed-background-dark">
+                <h2 class="text-light"><i class="gi gi-notes"></i> <strong>Datos</strong> de Consulta</h2>               
+                {% if request.user.is_superuser %}
+                <div class="block-options pull-right">
+                    <a href="{% url 'class_update_consulta' consulta.id %}" class="btn btn-sm btn-alt btn-default" data-toggle="tooltip" title="Editar Consulta / Añadir imágenes "><i class="fa fa-pencil"></i></a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="block-content">
+                <table class="table table-borderless table-responsive">
+                    <tbody>
+                        <tr>
+                            <td class="text-right" style="width: 50%;"><strong>Id</strong></td>
+                            <td><span class="label label-info">{{consulta.id}}</span></td>                            
+                        </tr>
+                        <tr>
+                            <td class="text-right"><strong>Paciente</strong></td>
+                            <td><a href="{% url 'detalle_paciente' consulta.pertenece.id %}"><span class="label label-info">{{consulta.pertenece}}-{{consulta.pertenece.Nombre}}<br>
+                                 {{consulta.pertenece.Apellido_Paterno}} {{consulta.pertenece.Apellido_Materno}}</span></a></td>
+                        </tr>
+                        <tr>
+                            <td class="text-right"><strong>Consulta Creada</strong></td>
+                            <td class="themed-color-autumn">{{consulta.creada}}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-right"><strong>Consulta Modificada</strong></td>
+                            <td class="themed-color-autumn">{{consulta.modificada|naturaltime}} - {{consulta.modificada}}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-right"><strong>Hora Programada</strong></td>
+                            <td>{{consulta.start_time}}</td>
+                        </tr>
+                        {% if consulta.end_time %}
+                        <tr>
+                            <td class="text-right"><strong>Hora de fin de Consulta</strong></td>
+                            <td>{{consulta.end_time}}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td class="text-right"><strong>Atendió</strong></td>
+                            <td><a href="{% url 'class_detail_persona' consulta.atiende.id %}"><span class="label label-success">{{consulta.atiende}}</span></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+<!-- END Datos de consuta -->
+
+<!-- Imagenes de consuta -->
+        <div class="block">
+            <div class="block-title themed-background-dark">
+                <h2 class="text-light"><i class="fa fa-picture-o"></i> <strong>Imágenes</strong> de Consulta</h2>                           
+                {% if request.user.is_superuser %}
+                <div class="block-options pull-right">
+                    <a href="{% url 'class_update_consulta' consulta.id %}" class="btn btn-sm btn-alt btn-default" data-toggle="tooltip" title="Editar Consulta / Añadir Imágenes"><i class="fa fa-pencil"></i></a>                    
+                </div>
+                {% endif %}
+            </div>
+            <div class="gallery" data-toggle="lightbox-gallery">
+                <div class="row">                    
+                    <div class="row justify-content-center">
+
+                        {% if consulta.transoral_neutra %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{consulta.transoral_neutra.url}}" class="gallery-link" title="{{consulta.transoral_neutra}}">
+                                <img src="{{consulta.transoral_neutra.url}}" alt="transoral neutra" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Transoral Neutra</strong>
+                        </div>                                            
+                        </div>
+                        {% endif %}
+                        {% if consulta.transoral_dinamica_derecha %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{consulta.transoral_dinamica_derecha.url}}" class="gallery-link" title="{{consulta.transoral_dinamica_derecha}}">
+                                <img src="{{consulta.transoral_dinamica_derecha.url}}" alt="transoral dinamica derecha" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                            <div class="caption hidden-xs text-center">
+                                <strong>Transoral Dinámica Derecha</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if consulta.transoral_dinamica_izquierda %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{consulta.transoral_dinamica_izquierda.url}}" class="gallery-link" title="{{consulta.transoral_dinamica_izquierda}}">
+                                <img src="{{consulta.transoral_dinamica_izquierda.url}}" alt="transoral dinamica izquierda" class="img-fluid img-rounded" style="overflow: hidden;">
+                            </a>
+                            <div class="caption hidden-xs text-center">
+                                <strong>Transoral Dinámica Izquierda</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if consulta.AP_cervical %}
+                        <div class=" col-12 col-md-4 col-lg-3">
+                            <a href="{{consulta.AP_cervical.url}}" class="gallery-link" title="{{consulta.AP_cervical}}">
+                                <img src="{{consulta.AP_cervical.url}}" alt="AP cervical" class="img-fluid img-rounded" style=" overflow: hidden;">
+                            </a>
+                            <div class="caption hidden-xs text-center">
+                                <strong>AP Cervical</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row justify-content-center">
+
+                    {% if consulta.AP_toraxica %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.AP_toraxica.url}}" class="gallery-link" title="{{consulta.AP_toraxica}}">
+                            <img src="{{consulta.AP_toraxica.url}}" alt="AP toraxica" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>AP Toráxica</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if consulta.AP_lumbopelvica %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.AP_lumbopelvica.url}}" class="gallery-link" title="{{consulta.AP_lumbopelvica}}">
+                            <img src="{{consulta.AP_lumbopelvica.url}}" alt="AP lumbopelvica" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>AP Lumbo Pélvica</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if consulta.lateral_cervical %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.lateral_cervical.url}}" class="gallery-link" title="{{consulta.lateral_cervical}}">
+                            <img src="{{consulta.lateral_cervical.url}}" alt="lateral cervical" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Lateral Cervical</strong>
+                        </div>
+                    {% endif %}
+                    </div>
+                    {% if consulta.lateral_toraxica %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.lateral_toraxica.url}}" class="gallery-link" title="{{consulta.lateral_toraxica}}">
+                            <img src="{{consulta.lateral_toraxica.url}}" alt="lateral toraxica" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Lateral Toráxica</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    </div>
+
+                    <div class="row justify-content-center">
+                    {% if consulta.lateral_lumbopelvica %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.lateral_lumbopelvica.url}}" class="gallery-link" title="{{consulta.lateral_lumbopelvica}}">
+                            <img src="{{consulta.lateral_lumbopelvica.url}}" alt="lateral lumbopelvica" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Lateral Lumbo Pélvica</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if consulta.cervical_extension %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.cervical_extension.url}}" class="gallery-link" title="{{consulta.cervical_extension}}">
+                            <img src="{{consulta.cervical_extension.url}}" alt="cervical extension" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Cervical Extensión</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if consulta.cervical_flexion %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.cervical_flexion.url}}" class="gallery-link" title="{{consulta.cervical_flexion}}">
+                            <img src="{{consulta.cervical_flexion.url}}" alt="cervical flexion" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Cervical Flexión</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if consulta.stitch_AP %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.stitch_AP.url}}" class="gallery-link" title="{{consulta.stitch_AP}}">
+                            <img src="{{consulta.stitch_AP.url}}" alt="stitch AP" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Stitch AP</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    </div>
+
+                    <div class="row justify-content-center">
+                    {% if consulta.stitch_lateral %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.stitch_lateral.url}}" class="gallery-link" title="{{consulta.stitch_lateral}}">
+                            <img src="{{consulta.stitch_lateral.url}}" alt="stitch lateral" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Stitch Lateral</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if consulta.posturometria_frente %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.posturometria_frente.url}}" class="gallery-link" title="{{consulta.posturometria_frente}}">
+                            <img src="{{consulta.posturometria_frente.url}}" alt="posturometria_frente" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Post. Frente</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if consulta.posturometria_lateral %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.posturometria_lateral.url}}" class="gallery-link" title="{{consulta.posturometria_lateral}}">
+                            <img src="{{consulta.posturometria_lateral.url}}" alt="posturometria_lateral" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Post. Lateral</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if consulta.posturometria_posterior %}
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a href="{{consulta.posturometria_posterior.url}}" class="gallery-link" title="{{consulta.posturometria_posterior}}">
+                            <img src="{{consulta.posturometria_posterior.url}}" alt="posturometria_posterior" class="img-fluid img-rounded" style=" overflow: hidden;">
+                        </a>
+                        <div class="caption hidden-xs text-center">
+                            <strong>Post. Posterior</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    </div>
+
+                    <div class="row justify-content-center">
+                        {% if consulta.scanner %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{consulta.scanner.url}}" class="gallery-link" title="{{consulta.scanner}}">
+                                <img src="{{consulta.scanner.url}}" alt="scanner" class="img-fluid img-rounded" style=" overflow: hidden;">
+                            </a>
+                            <div class="caption hidden-xs text-center">
+                                <strong>Scanner</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+        
+                        {% if consulta.extra_1 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{consulta.extra_1.url}}" class="gallery-link" title="{{consulta.extra_1}}">
+                                <img src="{{consulta.extra_1.url}}" alt="" class="img-fluid img-rounded" style=" overflow: hidden;">
+                            </a>
+                            <div class="caption hidden-xs text-center">
+                                <strong>Extra 1</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+        
+                        {% if consulta.extra_2 %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{consulta.extra_2.url}}" class="gallery-link" title="{{consulta.extra_2}}">
+                                <img src="{{consulta.extra_2.url}}" alt="" class="img-fluid img-rounded" style=" overflow: hidden;">
+                            </a>
+                            <div class="caption hidden-xs text-center">
+                                <strong>Extra 2</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+        
+                        {% if consulta.foto %}
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <a href="{{consulta.foto.url}}" class="gallery-link" title="{{consulta.foto}}">
+                                <img src="{{consulta.foto.url}}" alt="" class="img-fluid img-rounded" style=" overflow: hidden;">
+                            </a>
+                            <div class="caption hidden-xs text-center">
+                                <strong>Foto</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>                  
+                </div>                
+            </div>
+        </div>
+    </div>
+<!-- END Imagenes de consuta -->
+
+<!-- Detalle de consuta -->
+    <div class="col-lg-8 text-justify">
+        <div class="block">
+            <div class="block-title themed-background-dark">
+                <h2 class="text-light"><i class="gi gi-book"></i> <strong>Detalle</strong> de Consulta</h2>               
+                {% if request.user.is_superuser %}
+                <div class="block-options pull-right">
+                    <a href="{% url 'class_update_consulta' consulta.id %}" class="btn btn-sm btn-alt btn-default" data-toggle="tooltip" title="Editar Consulta / Añadir imágenes "><i class="fa fa-pencil"></i></a>
+                </div>
+                {% endif %}
+            </div>            
+            <table class="table table-borderless table-responsive">
+                <thead>
+                    {% if consulta.Padecimiento_actual %}
+                    <tr>
+                        <td class="text-justify"><strong>Padecimiento Actual</strong></td>
+                        <td>{{consulta.Padecimiento_actual|safe}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.Ajuste_de_hoy %}
+                    <tr>
+                        <td class="text-justify"><strong>Ajuste de Hoy</strong></td>
+                        <td>{{consulta.Ajuste_de_hoy|safe}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.general %}
+                    <tr>
+                        <td class="text-justify"><strong>Columna General</strong></td>
+                        <td>{{consulta.general}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.cervical %}
+                    <tr>
+                        <td class="text-justify"><strong>Cervical</strong></td>
+                        <td>{{consulta.cervical}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.toraxica %}
+                    <tr>
+                        <td class="text-justify"><strong>Toráxica</strong></td>
+                        <td>{{consulta.toraxica}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.lumbo_sacra %}
+                    <tr>
+                        <td class="text-justify"><strong>Lumbo Sacra</strong></td>
+                        <td>{{consulta.lumbo_sacra}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.sacro_iliaco %}
+                    <tr>
+                        <td class="text-justify"><strong>Sacro Iliaco</strong></td>
+                        <td>{{consulta.sacro_iliaco}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.coccix %}
+                    <tr>
+                        <td class="text-justify"><strong>Coccix</strong></td>
+                        <td>{{consulta.coccix}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.pelvis_cadera %}
+                    <tr>
+                        <td class="text-justify"><strong>Pelvis - Cadera</strong></td>
+                        <td>{{consulta.pelvis_cadera}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.curvatura %}
+                    <tr>
+                        <td class="text-justify"><strong>Curvatura</strong></td>
+                        <td>{{consulta.curvatura}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.cefaleas %}
+                    <tr>
+                        <td class="text-justify"><strong>Cefaleas</strong></td>
+                        <td>{{consulta.cefaleas}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.hombro %}
+                    <tr>
+                        <td class="text-justify"><strong>Hombro</strong></td>
+                        <td>{{consulta.hombro}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.codo_a_mano %}
+                    <tr>
+                        <td class="text-justify"><strong>Codo a Mano</strong></td>
+                        <td>{{consulta.codo_a_mano}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.rodilla %}
+                    <tr>
+                        <td class="text-justify"><strong>Rodilla</strong></td>
+                        <td>{{consulta.rodilla}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if consulta.pronostico %}
+                    <tr>
+                        <td class="text-justify"><strong>Pronóstico</strong></td>
+                        <td>{{consulta.pronostico}}</td>
+                    </tr>
+                    {% endif %}
+                </thead>
+            </table>            
+        </div>
+<!-- END Detalle de consuta -->
+
+<!-- Notas de consuta -->
+        {% if consulta.notas %}
+        <div class="block">
+            <div class="block-title themed-background-dark">
+                <h2 class="text-light"><i class="fa fa-pencil-square-o"></i> <strong>Notas</strong></h2> 
+                {% if request.user.is_superuser %}
+                <div class="block-options pull-right">
+                    <a href="{% url 'class_update_consulta' consulta.id %}" class="btn btn-sm btn-alt btn-default" data-toggle="tooltip" title="Editar Consulta / Añadir imágenes "><i class="fa fa-pencil"></i></a>
+                </div>
+                {% endif %}                
+            </div>            
+            <div class="blog-content">
+                <h5 class="font-weight-bold text-justify mb-2 display-4">{{consulta.notas|safe}}</h5>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+<!-- END Notas de consuta -->
+</div>
+
+{% endblock %}

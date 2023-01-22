@@ -1,0 +1,128 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+
+{% block titulo %}
+    <title> Editar del Album </title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+
+    <li>
+        <a href="#" class=" text-primary sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                <a href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+                <a href="{% url 'class_detail_paciente' album.record.id %}">Bitácora del paciente</a>
+                <a href="{% url 'class_detail_album' album.id %}">Detalle de álbum</a>
+                <a class="active">Editar álbum</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="gi gi-phone_alt sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Citas</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_cita_lista' %}">Archivo de Citas</a>
+                <a href="{% url 'class_upload_cita' %}">Agendar Cita</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-stethoscope sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                <a href="{% url 'class_upload_consulta' %}">Crear Consulta</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Médicos</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_medico_lista' %}">Archivo de Médicos</a>
+                <a href="{% url 'class_upload_medico' %}">Crear Médico</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+
+{% block mainblock %}
+<!-- Page content -->
+    <div id="page-content">
+                       <!-- Forms General Header -->
+                       <div class="content-header themed-background-dark-night">
+                           <div class="header-section">
+                               <h1>
+                                   <i class="fa fa-camera-retro themed-color-night"></i>
+                                   <h1 class="themed-color-night">Registra, edita y elimina las imágenes y archivos personales del album del paciente</h1><br>
+                                   <small class="text-light">los campos con * son obligatorios</small>
+                               </h1>
+                           </div>
+                       </div>
+                       <ul class="breadcrumb breadcrumb-top themed-background-night">
+                           <li class="breadcrumb-item"><a href="{% url 'home' %}" class="themed-color-dark-waterlily"><i class="fa fa-home themed-color-dark"></i> Home</a></li>
+                           <li><a class="themed-color-dark-waterlily" href="{% url 'panel2' %}">Menú Principal</a></li>
+                           <li><a class="themed-color-dark-waterlily" href="{% url 'pacientes_lista' %}">Lista pacientes</a></li>
+                           <li><a class="themed-color-dark-waterlily" href="{% url 'class_detail_paciente' album.record.id %}">Bitácora del Paciente</a></li>
+                           <li><a class="themed-color-dark-waterlily" href="{% url 'class_detail_album' album.id %}">Detalle de album</a></li>
+                           <li class="text-light">Editar album</li>
+                       </ul>
+                       <!-- END Forms General Header -->
+
+                       <div class="row">
+                         <div class="col-sm-2">
+                         </div>
+                          <div class="col-sm-8">
+                              <!-- Normal Form Block -->
+                            <div class="block themed-border-night">
+                                <!-- Normal Form Title -->
+                                <div class="block-title themed-background-dark-night themed-color-night">
+                                      <h2><strong>Imágenes y Archivos personales</strong></h2>
+                                </div>
+                                <!-- END Normal Form Title -->
+
+                                <!-- Normal Form Content -->
+                                <form action="{% url 'class_update_album' album.id %}" method="POST" class="form-bordered" enctype="multipart/form-data">
+                                     <div class="form-group themed-color-dark-night">
+                                        {% csrf_token %}
+                                        {{form|crispy}}
+                       					{{form.media}}
+                       							 <br>
+                                     </div>
+                                        <div class="form-group">
+                                              <button type="submit" value="Guardar" class="btn btn-info btn-lg btn-block themed-background-dark-night text-light">Guardar</button>
+                                        </div>
+                                </form>
+                       			</div>
+                               <!-- END Normal Form Content -->
+                            </div>
+                                <!-- END Normal Form Block -->
+                         </div>
+                         <div class="col-sm-2">
+                         </div>
+                                <!-- END Input Sizes Block -->
+     </div>
+ <!-- END Page Content -->
+{% endblock %}
