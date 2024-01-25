@@ -1,0 +1,69 @@
+{% extends 'calendario/master_2.html' %}
+{% load static %}
+
+{% block titulo %}
+        <title>Calendario Google</title>
+{% endblock %}
+
+
+{% block header %}
+    <!-- Page content -->
+    <div id="page-content">
+                        <!-- eCommerce Orders Header -->
+                        <div class="content-header themed-background-info">
+                            <ul class="nav-horizontal text-center">
+                                <li>
+                                    <a href="{% url 'panel2' %}" class="themed-background-info themed-color-dark-modern"><i class="fa fa-windows sidebar-nav-icon themed-color-dark-modern"></i> Menú Principal</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'pacientes_lista' %}" class="themed-background-info themed-color-dark-modern"><i class="fa fa-wheelchair sidebar-nav-icon themed-color-dark-modern"></i> Pacientes</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'calendario' %}" class="themed-background-info text-light"><i class="fa fa-calendar  themed-color-dark-info"></i> Calendario Google</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'class_consulta_lista' %}" class="themed-background-info themed-color-dark-modern"><i class="fa fa-stethoscope themed-color-dark-modern"></i> Consultas</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'class_personas_lista' %}" class="themed-background-info themed-color-dark-modern"><i class="gi gi-group themed-color-dark-modern"></i> Staff</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'admin:login' %}" class="themed-background-info themed-color-dark-modern"><i class="fa fa-cogs themed-color-dark-modern"></i> Admin</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <ul class="breadcrumb breadcrumb-top themed-background-night">
+                            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="themed-color-dark-waterlily"><i class="fa fa-home themed-color-dark"></i> Home</a></li>
+                            <li><a class="themed-color-dark-waterlily" href="{% url 'panel2' %}">Menú Principal</a></li>
+                            <li><a class="text-light">Calendario Google</a></li>
+
+                        </ul>
+    </div>
+                        <!-- END eCommerce Orders Header -->
+{% endblock %}
+
+{% block mainblock %}
+<div class="row">
+	<div class="col-xs-1"></div>
+	<div class="col-xs-10">
+        {% if calendario %}
+		  {% for x in calendario %}
+		      	<div class="row">
+			     	<iframe src="{{x.url}}" frameborder="0" style="overflow:hidden;height:100vh;width:100%" height="100%" width="100%"></iframe>		
+			    </div>
+	      {% endfor %}
+        {% else %}
+            <div class="row">
+                <center>
+                    <h3 class="themed-color-dark-night">No se encontró calendario. Por favor añada o revise la direccion URL de Clínica.</h3>
+                    <a href="{% url 'admin:login' %}"><button type="submit" class="btn text-light themed-background-dark-night ">añadir URL</button></a>                                                          
+                </center>
+            </div>
+        {% endif %}
+
+	</div>
+	<div class="col-xs-1"></div>
+</div>
+<br>
+
+{% endblock %}

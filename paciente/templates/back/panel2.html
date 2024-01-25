@@ -1,0 +1,189 @@
+{% extends 'back/master.html' %}
+{% load static %}
+
+{% block X %}
+{% endblock %}
+
+{% block y %}
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block header %}
+<div id="page-content">
+<div class="content-header content-header-media">
+  <div class="header-section">
+      <img src="{{user.persona.Foto.url}}" alt="Avatar" class="pull-right img-circle" width="100" height="100">
+      <h1>Bienvenido <strong>{{user.persona.Nombre}} {{user.persona.Apellido_Paterno}}
+      <h1>{{user.persona.Rol}}</h1>
+      </strong><br><small>la última sesión fue:  {{ user.last_login }}</small></h1>
+  </div>
+<!-- For best results use an image with a resolution of 2560x248 pixels (You can also use a blurred image with ratio 10:1 - eg: 1000x100 pixels - it will adjust and look great!) -->
+  <img src="{% static 'assets/images/paisaje2.jpg' %}" alt="header image" class="animation-pulseSlow">
+</div>
+<br>
+<br>
+{% endblock %}
+
+{% block mainblock %}
+
+<!-- timeline widget -->
+<div class="row">
+
+<!-- Calendario  -->
+<div class="col-sm-6">
+  <div class="widget">
+    <div class="widget-extra themed-background-dark">
+      <div class="widget-options">
+        <div class="btn-group btn-group-xs">
+          <a href="{% url 'calendario' %}" class="btn btn-default" data-toggle="tooltip" title="Calendario"><i class="fa fa-calendar"></i></a>
+        </div>
+      </div>
+      <h3 class="widget-content-light">
+      <strong>Calendario</strong>      
+      </h3>
+    </div>
+  <div class="widget-extra">
+    
+        {% if objetos %}
+          {% for x in objetos %}
+            <div class="row">
+            <iframe src="{{x.url}}" frameborder="0" style="overflow:hidden;height:100vh;width:100%" height="100%" width="100%"></iframe>    
+            </div>
+          {% endfor %}
+        {% else %}
+        <div class="row">
+          <center>
+            <h3 class="themed-color-dark-night">No se encontró calendario. Por favor añada o revise la direccion URL de Clínica.</h3>
+            <a href="{% url 'admin:login' %}"><button type="submit" class="btn text-light themed-background-dark-night ">añadir URL</button></a>                    
+          </center>
+        </div>
+       {% endif %}
+    
+    <center>
+      <a href="{% url 'calendario' %}" class="btn btn-xs btn-default">Ver más..</a><br>&nbsp
+    </center>
+  </div>
+  </div>
+</div>
+
+<!-- tabla paciente -->
+<div class="col-sm-6">
+  <div class="widget">
+    <div class="widget-extra themed-background-dark">
+      <div class="widget-options">
+        <div class="btn-group btn-group-xs">
+          <a href="{% url 'class_upload_paciente' %}" class="btn btn-default" data-toggle="modal" title="Agregar paciente"><i class="fa fa-wheelchair"></i></a>            
+        </div>
+      </div>
+      <h3 class="widget-content-light">
+      Últimos <strong>Pacientes</strong>      
+      </h3>
+    </div>
+  <div class="widget-extra">
+    <div class="row">
+    <table class="table table-bordered table-striped table-vcenter">
+      <tr>
+        <th>ID</th>
+        <th>Paciente</th> 
+        <th>Edad</th>
+        <th>Creado</th>   
+      </tr>                            
+  {% for x in monos %}
+      <tr>
+        <td>{{x.record}}</td>
+        <td>{{x.otro_nombre}}</td>    
+        <td>{{x.calculo_edad}}</td>
+        <td>{{x.creada}}</td>
+
+      </tr>
+  {% endfor %}
+    </table>
+    </div>
+    <center>
+      <a href="{% url 'pacientes_lista' %}" class="btn btn-xs btn-default">Ver más..</a><br>&nbsp
+    </center>
+  </div>
+  </div>
+</div>
+
+<!-- Ttabla consultas -->
+<div class="col-sm-6">
+  <div class="widget">
+    <div class="widget-extra themed-background-dark">
+      <div class="widget-options">
+        <div class="btn-group btn-group-xs">
+         <a href="{% url 'class_upload_consulta' %}" class="btn btn-default" data-toggle="tooltip" title="Agregar Consulta"><i class="fa fa-stethoscope"></i></a>          
+        </div>
+      </div>
+      <h3 class="widget-content-light">
+      Últimas <strong>Consultas</strong>      
+      </h3>
+    </div>
+  <div class="widget-extra">
+    <div class="row">
+    <table class="table table-bordered table-striped table-vcenter">
+        <tr>
+          <th>ID</th>
+          <th>Paciente</th>
+          <th>Atendió</th>
+          <th>Fecha</th>
+        </tr>                            
+  {% for x in terapias %}
+        <tr>
+          <td>{{x.id}}</td>
+          <td>{{x.pertenece}}</td>
+          <td>{{x.atiende}}</td>
+          <td>{{x.creada}}</td>
+        </tr>
+  {% endfor %}
+    </table>
+    </div>
+    <center>
+      <a href="{% url 'class_consulta_lista' %}" class="btn btn-xs btn-default">Ver más..</a><br>&nbsp
+    </center>
+  </div>
+  </div>
+</div>
+
+<!-- Tabla usuario -->
+<div class="col-sm-6">
+  <div class="widget">
+    <div class="widget-extra themed-background-dark">
+      <div class="widget-options">
+        <div class="btn-group btn-group-xs">
+         <a href="{% url 'class_upload_persona' %}" class="btn btn-default" data-toggle="tooltip" title="Agregar Usuario"><i class="fa fa-group"></i></a>          
+        </div>
+      </div>
+      <h3 class="widget-content-light">
+      Últimos <strong>Usuarios</strong>      
+      </h3>
+    </div>
+  <div class="widget-extra">
+    <div class="row">
+        <table class="table table-bordered table-striped table-vcenter">
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Rol</th>
+        </tr>                            
+        {% for x in chambiador %}
+        <tr>
+          <td>{{x.id}}</td>
+          <td>{{x.Nombre}}</td>    
+          <td>{{x.Rol}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+    </div>
+    <center>
+      <a href="{% url 'class_personas_lista' %}" class="btn btn-xs btn-default">Ver más..</a><br>&nbsp
+    </center>    
+  </div>
+  </div>
+</div>
+
+</div>
+
+{% endblock %}

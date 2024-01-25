@@ -1,0 +1,156 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block titulo %}
+    <title> Detalle de {{medico.get_fullname}} </title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+
+       <li>
+        <a href="{% url 'calendario' %}" ><i class="fa fa-calendar sidebar-nav-icon"></i>Calendario Google</a>
+    </li>
+
+
+
+    <li>
+        <a href="#" class=" sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                <a href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+            </li>
+
+        </ul>
+    </li>
+
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-stethoscope sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                <a href="{% url 'class_upload_consulta' %}">Crear Consulta</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="#" class="text-primary sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Staff</span></a>
+        <ul>
+            <li>
+                <a class="active">Perfil de Usuario</a>
+                <a href="{% url 'class_personas_lista' %}">Archivo de Staff</a>
+                <a href="{% url 'class_upload_persona' %}">Agregar usuario</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+{% block header %}
+<div class="content-header themed-background-dark-modern">
+    <div class="header-section">
+        <h1>
+            <i class="gi gi-notes_2 themed-color-modern"></i>
+            <h2 class="text-light">{{persona.Apellido_Paterno}} {{persona.Apellido_Materno}} {{persona.Nombre}}</h2>
+            <h4 class="themed-color-modern">{{persona.Rol}}</h4>
+            <h4 class="text-light">Id: {{persona.id}}</h4><br>
+            <div class=" block-options text-center">
+                <a href="{% url 'class_update_persona' persona.id %}" class="btn btn-sm btn-default themed-background-modern" data-toggle="tooltip" title="Editar perfil"><i class="fa fa-pencil text-light"></i></a>&nbsp;
+                {% if object.facebook %}
+                    <a href="{{object.facebook}}" class="btn btn-default themed-background-modern" data-toggle="tooltip" title="Facebook"><i class="fa fa-facebook text-light"></i></a>&nbsp;
+                {% endif %}
+                {% if object.twitter %}
+                    <a href="{{object.twitter}}" class="btn btn-default themed-background-modern" data-toggle="tooltip" title="Twitter"><i class="fa fa-twitter text-light"></i></a>&nbsp;
+                {% endif %}
+                {% if object.linkedin %}
+                    <a href="{{object.linkedin}}" class="btn btn-default themed-background-modern" data-toggle="tooltip" title="Linkedin"><i class="fa fa-linkedin text-light"></i></a>&nbsp;
+                {% endif %}
+                {% if object.instagram %}
+                    <a href="{{object.instagram}}" class="btn btn-default themed-background-modern" data-toggle="tooltip" title="Instagram"><i class="fa fa-instagram text-light"></i></a>&nbsp;
+                {% endif %}
+                {% if object.email %}
+                    <a href="" class="btn btn-default themed-background-modern" data-toggle="tooltip" title="Enviar correo"><i class="fa fa-paper-plane text-light"></i></a>&nbsp;
+                {% endif %}
+                <a href="{% url 'logout' %}" class="btn btn-default themed-background-modern" data-toggle="tooltip" title="Cerrar Sesión"><i class="gi gi-exit text-light"></i></a>&nbsp;
+            </div>
+        </h1>
+    </div>
+</div>
+<ul class="breadcrumb breadcrumb-top themed-background-night">
+  <li class="breadcrumb-item"><a href="{% url 'home' %}" class="themed-color-dark-waterlily"><i class="fa fa-home themed-color-dark"></i> Home</a></li>
+  <li><a class="themed-color-dark-waterlily" href="{% url 'panel2' %}">Menú Principal</a></li>
+  <li><a class="themed-color-dark-waterlily" href="{% url 'class_personas_lista' %}">Lista de Staff</a></li>
+  <li><a class="text-light">Detalle de Usuario</a></li>
+</ul>
+{% endblock %}
+
+{% block mainblock %}
+{% if consultas %}
+
+{% endif %}
+<div class="row">
+  <div class="card-body">
+    <div class="col-xs-12 col-md-4 ">
+      <br>
+      <center><img src="{{object.Foto.url}}" alt="avatar" width="250" height="250" class="img-circle img-thumbnail"></center>
+      <br>
+    </div>
+    <div class="col-xs-12 col-md-7 block">
+        <div class="block-title themed-color-autumn">
+            <h1>Información <strong>General</strong></h1>
+        </div>
+        <div class="col-xs-6">
+          <h4 class="text-justify themed-color-dark-night">Apellido Paterno:</h4><br>
+          {% if object.Apellido_Materno %}
+          <h4 class="text-justify themed-color-dark-night">Apellido Materno:</h4><br>
+          {% endif %}
+          <h4 class="text-justify themed-color-dark-night">Nombre:</h4><br>
+          {% if object.Cedula %}
+          <h4 class="text-justify themed-color-dark-night">Cédula:</h4><br>
+          {% endif %}
+        </div>
+        <div class="col-xs-6">
+          <h4 class="text-justify themed-color-blackberry">{{object.Apellido_Paterno}}</h4><br>
+          {% if object.Apellido_Materno %}
+          <h4 class="text-justify themed-color-blackberry">{{object.Apellido_Materno}}</h4><br>
+          {% endif %}
+          <h4 class="text-justify themed-color-blackberry">{{object.Nombre}}</h4><br>
+          {% if object.Cedula %}
+          <h4 class="text-justify themed-color-blackberry">{{object.Cedula}}</h4><br>
+          {% endif %}
+        </div>
+        <div class="block-title themed-color-autumn">
+            <h1>Información <strong>de Contacto</strong></h1>
+        </div>
+        <div class="col-xs-6">
+          <h4 class="text-justify themed-color-dark-night">Teléfono:</h4><br>
+          {% if object.email %}
+          <h4 class="text-justify themed-color-dark-night">E-mail:</h4><br>
+          {% endif %}
+        </div>
+        <div class="col-xs-6">
+          <h4 class="text-justify themed-color-blackberry">{{object.Telefono}}</h4><br>
+          {% if object.email %}
+          <h4 class="text-justify themed-color-blackberry">{{object.email}}</h4><br>
+          {% endif %}
+        </div>
+       
+    </div>
+  </div>
+</div>
+{% endblock %}

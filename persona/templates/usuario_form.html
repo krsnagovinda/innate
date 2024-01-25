@@ -1,0 +1,123 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+
+{% block title %}
+    <title> Datos del Usuario </title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+
+    <li>
+        <a href="{% url 'calendario' %}" ><i class="fa fa-calendar sidebar-nav-icon"></i>Calendario Google</a>
+    </li>
+
+
+
+    <li>
+        <a href="#" class=" sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                <a href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+            </li>
+
+        </ul>
+    </li>
+ 
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-stethoscope sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                <a href="{% url 'class_upload_consulta' %}">Crear Consulta</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="#" class="text-primary sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Staff</span></a>
+        <ul>
+            <li>
+                <a class="active">Editar Médico</a>
+                <a href="{% url 'class_personas_lista' %}">Archivo de Staff</a>
+                <a href="{% url 'class_upload_persona' %}">Agregar usuario</a>
+                <a href="{% url 'class_detail_persona' user.id %}">Perfil de Usuario</a>             
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+
+{% block mainblock %}
+<!-- Page content -->
+<div id="page-content">
+                       <!-- Forms General Header -->
+                       <div class="content-header themed-background-dark-modern">
+                           <div class="header-section">
+                               <h1>
+                                   <i class="gi gi-notes_2 themed-color-modern"></i>
+                                   <h1 class="themed-color-modern">Editar datos de: </h1>
+                                   <h2 class="text-light">{{persona.get_fullname}}</h2>
+                                   <h3 class="themed-color-modern">{{ persona.Rol }} </h3><br>
+                                  <small class="text-light">los campos con * son obligatorios</small>
+                               </h1>
+                           </div>
+                       </div>
+                       <ul class="breadcrumb breadcrumb-top themed-background-modern">
+                           <li class="breadcrumb-item"><a href="{% url 'home' %}" class="themed-color-dark-modern"><i class="fa fa-home themed-color-dark-modern"></i> Home</a></li>
+                           <li><a class="themed-color-dark-modern" href="{% url 'panel2' %}">Panel</a></li>
+                           <li><a class="themed-color-dark-modern" href="{% url 'class_personas_lista' %}">Lista de Staff</a></li>
+                           <li><a class="themed-color-dark-modern" href="{% url 'class_detail_persona' persona.id %}">Detalle de Usuario</a></li>
+                           <li class="text-light">Editar Usuario </li>
+                       </ul>
+                       <!-- END Forms General Header -->
+
+                       <div class="row">
+                           <div class="col-sm-2">
+
+                           </div>
+                           <div class="col-sm-8">
+                               <!-- Normal Form Block -->
+                               <div class="block themed-border-modern">
+                                   <!-- Normal Form Title -->                                   
+                                   <!-- END Normal Form Title -->
+                                   <!-- Normal Form Content -->
+                                   <form action="{% url 'class_update_persona' persona.id %}" method="POST" class="form-bordered" enctype="multipart/form-data">
+                                      <div class="form-group themed-color-dark-modern">
+                                         {% csrf_token %}
+                                         {{form|crispy}}
+                                         {{form.media}}
+                                         <br>
+                                     </div>
+                                     <div class="form-group">
+                                         <button type="submit" class="btn btn-info btn-lg btn-block">Guardar</button>
+                                         </div>
+                                   </form>
+                                   </div>
+                                   <!-- END Normal Form Content -->
+                               </div>
+                               <!-- END Normal Form Block -->
+                               </div>
+                               <div class="col-sm-2">
+
+                               </div>
+                               <!-- END Input Sizes Block -->
+                       </div>
+
+{% endblock %}

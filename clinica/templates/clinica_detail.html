@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+
+{% block title %}
+    <title> Detalle de Clínica </title>
+{% endblock %}
+
+
+{% block content %}
+
+<section>
+    <div class="container-fluid ">
+      <div class="row mb-5 px-5">
+        <div class="col-xl-10 col-lg-9 col-md-11 ml-auto">
+          <div class="row">
+            <div class="col-12">
+              <h2 class="text-muted text-center mb-4">Detalle de Clínica</h2>
+
+              <div class="row">
+                <div class="container jumbotron col-10">
+
+                      <h3 class="text-center mb-4">{{object.Nombre_Clinica}}</h3>
+                      <p class="text-justify mb-2 datos">Dirección:</p> <p class="datos2 mb-4"> {{object.Direccion}}</p>
+                      <p class="text-justify mb-2 datos">Teléfono:</p><p class="datos2 mb-4">{{object.Telefono|safe}}</p>
+											
+													<br>
+											<div class="col-7 mx-auto">
+                        <a href="{% url 'class_update_clinica' clinica.id%}" class="btn btn-primary btn-sm btn-block"><i class="fas fa-pencil-alt" aria-hidden="true"></i><br>Editar</a>
+                      </div>
+
+
+                  </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

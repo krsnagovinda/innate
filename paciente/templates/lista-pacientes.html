@@ -1,0 +1,232 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block titulo %}
+    <title> Lista de Pacientes </title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+    {% if request.user.is_superuser %}
+  <li>
+    <center>
+      <a href="{% url 'class_upload_paciente' %}"><button class="btn btn-sm themed-background-night text-light"><i class="fa fa-plus"></i> Crear Paciente</button></a>
+  </li>
+  {% endif %}
+    <hr>
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+    <li>
+        <a href="{% url 'calendario' %}" ><i class="fa fa-calendar sidebar-nav-icon"></i>Calendario Google</a>
+    </li>
+    <li>
+        <a href="#" class=" text-warning sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-search sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Buscar Paciente</span></a>
+        <ul>
+            <li class="sidebar-header">
+                  <span class="sidebar-header-title">Id, Nombre o Apellido</span>
+            </li>
+            <li>
+              <form class="search" action="{% url 'search_results' %}" method?='get'>
+                  <input class="form-control" type="search" name="q" placeholder="Enter para buscar" aria-label="Search" title="">
+                  <br>
+              </form>
+            </li>
+            <li class="">
+                <a href="{% url 'SearchResultsFecha' %}"><i class="fa fa-calendar sidebar-nav-icon"></i><span class="themed-color-lake"> Fecha de creación</span></a>
+            </li>
+        </ul>
+      </li>
+    <li>
+        <a href="#" class=" text-primary sidebar-nav-menu active"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li>
+                <a  class="active"  href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+                {% endif %}
+            </li>
+
+        </ul>
+    </li>
+
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-stethoscope sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_consulta' %}">Crear Consulta</a>
+                {% endif %}
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Staff</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_personas_lista' %}">Archivo de Staff</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_persona' %}">Agregar usuario</a>
+                {% endif %}
+                <a href="{% url 'class_detail_persona' user.id %}">Perfil de Usuario</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+
+{% block header %}
+    <!-- Page content -->
+    <div id="page-content">
+                        <!-- eCommerce Orders Header -->
+                        <div class="content-header themed-background-dark-night">
+                            <ul class="nav-horizontal text-center">
+                                <li>
+                                    <a href="{% url 'panel2' %}" class="themed-background-dark-night text-light"><i class="fa fa-windows sidebar-nav-icon "></i> Menú Principal</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'pacientes_lista' %}" class="themed-background-dark-night themed-color-autumn"><i class="fa fa-wheelchair sidebar-nav-icon themed-color-autumn"></i> Pacientes</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'calendario' %}" class="themed-background-dark-night text-light"><i class="fa fa-calendar "></i> Calendario Google</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'class_consulta_lista' %}" class="themed-background-dark-night text-light"><i class="fa fa-stethoscope"></i> Consultas</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'class_personas_lista' %}" class="themed-background-dark-night text-light"><i class="gi gi-group"></i> Staff</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'admin:login' %}" class="themed-background-dark-night text-light"><i class="fa fa-cogs"></i> Admin</a>
+                                </li>
+                                {% if request.user.is_superuser %}
+                                <li>
+                                    <a href="{% url 'class_upload_paciente' %}" class="themed-background-dark-night themed-color-amethyst"><i class="themed-color-amethyst fa fa-user-plus"></i> Agregar Paciente</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <ul class="breadcrumb breadcrumb-top themed-background-night">
+                            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="themed-color-dark-waterlily"><i class="fa fa-home themed-color-dark"></i> Home</a></li>
+                            <li><a class="themed-color-dark-waterlily" href="{% url 'panel2' %}">Menú Principal</a></li>
+                            <li><a class="text-light">Lista pacientes</a></li>
+
+                        </ul>
+    </div>
+                        <!-- END eCommerce Orders Header -->
+{% endblock %}
+
+{% block mainblock %}
+
+{% for message in messages %}
+<!-- Success Alert Content -->
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4><i class="fa fa-check-circle"></i> Éxito</h4> <a href="javascript:void(0)" class="alert-link">{{ message }}</a>!
+</div>
+    <!-- END Success Alert Content -->
+{% endfor %}
+
+    <div class="block themed-border-night">
+        {% if pacientes %}
+        <div class="hidden-xs col-sm-2">
+            <button type="button" class="fa fa-wheelchair btn themed-background-autumn text-light"> Pacientes <span class="badge">{{contador}}</span></button>
+        </div>
+        <div class="col-xs-12 col-sm-10">
+            <form class="form-inline text-right search" action="{% url 'search_results' %}" method?='get'>
+                <input class="form-control mr-xs-4" type="search" name="q" placeholder="Id, Nombre, Apellido" aria-label="Search">
+                <button class="btn btn-inline-primary fa fa-search themed-background-modern my-3 my-sm-0" type="submit"> Buscar</button>
+            </form>
+            <br>
+        </div>
+
+        <table class="table table-bordered table-striped table-vcenter">
+            <thead>
+                <tr>
+                    <th class="text-center themed-color-dark-night">ID</th>
+                    <th class="text-center themed-color-dark-night">Nombre Paciente</th>
+                    <th class="text-center themed-color-dark-night hidden-xs">Foto</th>
+                    <th class="text-center themed-color-dark-night">Función</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for x in pacientes %}
+                <tr>
+                    <td class="text-center"><strong>{{x.record}}</strong></td>
+                    <td class="text-center">{{x.otro_nombre}}</td>
+                    <td class="text-center hidden-xs"><a href="{% url 'detalle_paciente' x.id %}"><img src="{{x.photo_1.url}}" alt="avatar" class="img-circle" height="50" width="50"></td></a>
+                    <td class="text-center">
+                        
+                        <div class="btn-group btn-group-md">
+                            <a href="{% url 'detalle_paciente' x.id %}" title="Datos personales, galería, consultas y citas" class="btn btn-default"><i class="fa fa-folder-open"></i></a>
+                        </div>
+                        {% if request.user.is_superuser %}
+                        <div class="btn-group btn-group-md">
+                            <a href="{% url 'class_delete_paciente' x.id %}" data-toggle="tooltip" title="¿Eliminar registro y sus datos?" class="btn btn-danger"><i class="fa fa-times"></i></a>
+                        </div>
+                        {% endif %}
+                    </td>
+                        
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+            {% else %}
+            <center>
+                <h3>no se han encontrado pacientes...</h3>
+                <img src="{% static 'website/img/bg-img/gato.png' %}" alt="" style="width:10%;">
+            </center>
+        {% endif %}
+
+        <div class="d-flex flex-row-reverse text-right">
+            {% load navigation_filters %}
+            {% if pacientes %}
+            {% if pacientes.has_other_pages %}
+                <ul class="pagination pagination-lg">
+            {% if pacientes.has_previous %}
+                <li class="page-item">
+                   <a href="?page={{pacientes.previous_page_number}}" class="page-link themed-color-night">&laquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link ">&laquo;</a>
+                </li>
+            {% endif %}
+            {% for i in pacientes.paginator.page_range|page_filter:pacientes %}
+            {% if pacientes.number == i %}
+                <li class="page-item active">
+                    <a class="page-link themed-background-night">{{i}}</a>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a href="?page={{i}}" class="page-link themed-color-night themed-background-dark-night">{{i}}</a>
+                </li>
+            {% endif %}
+            {% endfor %}
+            {% if pacientes.has_next %}
+                <li class="page-item">
+                    <a href="?page={{pacientes.next_page_number}}" class="page-link themed-color-night">&raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">&raquo;</a>
+                </li>
+            {% endif %}
+                </ul>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

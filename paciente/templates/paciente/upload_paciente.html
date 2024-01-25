@@ -1,0 +1,135 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+
+{% block titulo %}
+    <title>Crear Paciente </title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+
+    <li>
+        <a href="{% url 'calendario' %}" ><i class="fa fa-calendar sidebar-nav-icon"></i>Calendario Google</a>
+    </li>
+
+
+    <li>
+        <a href="#" class="text-primary sidebar-nav-menu active" ><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                <a class="active" href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+            </li>
+
+        </ul>
+    </li>    
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-stethoscope sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                <a href="{% url 'class_upload_consulta' %}">Crear Consulta</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Staff</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_personas_lista' %}">Archivo de Staff</a>
+                <a href="{% url 'class_upload_persona' %}">Agregar usuario</a>
+                <a href="{% url 'class_detail_persona' user.id %}">Perfil de Usuario</a>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+
+{% block mainblock %}
+
+{% for message in messages %}
+<!-- Success Alert Content -->
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4><i class="fa fa-check-circle"></i> Éxito</h4> <a href="javascript:void(0)" class="alert-link">{{ message }}</a>!
+</div>
+    <!-- END Success Alert Content -->
+{% endfor %}
+
+<!-- Page content -->
+    <div id="page-content">
+                       <!-- Forms General Header -->
+                       <div class="content-header themed-background-dark-night">
+                           <div class="header-section">
+                               <h1>
+                                   <i class="fa fa-cloud-upload themed-color-night"></i>
+                                   <h1 class="themed-color-night">Crear paciente</h1>
+                                   <h4 class="text-light">Registra datos personales y notas médicas</h4>
+                                   <small class="text-light">los campos con * son obligatorios</small>
+                               </h1>
+                           </div>
+                       </div>
+
+                       <ul class="breadcrumb breadcrumb-top themed-background-night">
+                           <li class="breadcrumb-item"><a href="{% url 'home' %}" class="themed-color-dark-waterlily"><i class="fa fa-home themed-color-dark"></i> Home</a></li>
+                           <li><a class="themed-color-dark-waterlily" href="{% url 'panel2' %}">Menú Principal</a></li>
+                           <li><a class="themed-color-dark-waterlily" href="{% url 'pacientes_lista' %}">Lista pacientes</a></li>
+                           <li class="text-light">Crear nuevo paciente</li>
+                       </ul>
+
+                       <!-- END Forms General Header -->
+
+                       <div class="row">
+                           <div class="col-sm-2">
+
+                           </div>
+                           <div class="col-sm-8">
+                               <!-- Normal Form Block -->
+                               <div class="block themed-border-night ">
+                                   <!-- Normal Form Title -->
+                                   <div class="block-title themed-background-dark-night themed-color-night">
+                                       <h2><strong>Datos personales</strong></h2>
+                                   </div>
+                                   <!-- END Normal Form Title -->
+
+                                   <!-- Normal Form Content -->
+                                   <form action="{% url 'class_upload_paciente' %}" method="POST" class="form-bordered" enctype="multipart/form-data">
+                                      <div class="form-group themed-color-dark-blackberry">
+                                         {% csrf_token %}
+                                         {{form}}
+                                         {{form.media}}
+                                         <br>
+                                     </div>
+                                     <div class="form-group">
+                                       <button type="submit" class="btn text-light themed-background-dark-night btn-lg btn-block">Crear</button>
+                                     </div>
+                                </form>
+                                </div>
+                                   <!-- END Normal Form Content -->
+                               </div>
+                               <!-- END Normal Form Block -->
+
+                               <div class="col-sm-2">
+
+                               </div>
+                               <!-- END Input Sizes Block -->
+                       </div>
+        </div>
+  <!-- END Page Content -->
+{% endblock %}

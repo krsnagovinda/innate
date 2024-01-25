@@ -1,0 +1,159 @@
+{% extends 'back/master.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block titulo %}
+    <title> Consultas de paciente</title>
+{% endblock %}
+
+{% block sidebar %}
+<!-- Sidebar Navigation -->
+<ul class="sidebar-nav">
+      <hr>
+    <li class="sidebar-header">
+        <span class="sidebar-header-title">Elija una opción</span>
+    </li>
+
+    <li>
+        <a href="{% url 'panel2' %}" ><i class="fa fa-windows sidebar-nav-icon"></i>Menú Principal</a>
+    </li>
+
+    <li>
+        <a href="{% url 'calendario' %}" ><i class="fa fa-calendar sidebar-nav-icon"></i>Calendario Google</a>
+    </li>
+
+    <li>
+        <a href="#" class=" text-primary sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-wheelchair sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Pacientes</span></a>
+        <ul>
+            <li >
+                <a href="{% url 'pacientes_lista' %}">Archivo de Pacientes</a>
+                <a class="active">Bitácora de Consultas</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_paciente' %}">Crear Paciente</a>
+                {% endif %}
+            </li>
+
+        </ul>
+    </li>
+
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-stethoscope sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Consultas</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_consulta_lista' %}">Archivo de Consultas</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_consulta' %}">Crear Consulta</a>
+                {% endif %}
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="#" class="sidebar-nav-menu"><i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="fa fa-user-md sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Sección de Médicos</span></a>
+        <ul>
+            <li>
+                <a href="{% url 'class_personas_lista' %}">Archivo de Médicos</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'class_upload_persona' %}">Crear Médico</a>
+                {% endif %}
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <a href="{% url 'admin:login' %}" ><i class="fa fa-cogs sidebar-nav-icon"></i>Modo Adminstrador</a>
+    </li>
+<!-- END Sidebar Navigation -->
+{% endblock %}
+
+
+{% block header %}
+<div class="content-header themed-background-dark-night">
+    <div id="page-content">
+      <ul class="breadcrumb breadcrumb-top themed-background-night">
+          <li class="breadcrumb-item"><a href="{% url 'home' %}" class="themed-color-dark-waterlily"><i class="fa fa-home themed-color-dark"></i> Home</a></li>
+          <li><a class="themed-color-dark-waterlily" href="{% url 'panel2' %}">Menú Principal</a></li>
+          <li><a class="themed-color-dark-waterlily" href="{% url 'pacientes_lista' %}">Lista pacientes</a></li>          
+          <li><a class="text-light">Historial de consultas</a></li>
+      </ul>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block mainblock %}
+
+
+<div class="row">
+    {% if detalle_cons %}
+    <div class="col-sm-12">
+        <div class="block">
+            <div class="block-title">
+                <h2 class="themed-color-waterlily"><i class="fa fa-file-text-o"></i> <strong>Historial </strong> de Consultas</h2>
+            </div>
+            <div class="blog-content">
+                <table class="table table-striped table-vcenter table-responsive">
+        <thead>
+        <tr>
+            <th class="text-center themed-color-dark-amethyst">Id Consulta</th>
+            <th class="text-center themed-color-dark-amethyst hidden-xs">Paciente</th>
+            <th class="text-center themed-color-dark-amethyst">Atendió</th>
+            <th class="text-center themed-color-dark-amethyst hidden-xs">Sesión</th>
+            <th class="text-center themed-color-dark-amethyst">Fecha</th>
+            <th class="text-center themed-color-dark-amethyst hidden-xs">Hora inicio</th>
+            <th class="text-center themed-color-dark-amethyst hidden-xs">Hora Final</th>
+            <th class="text-center themed-color-dark-amethyst">Función</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for x in detalle_cons %}
+            <tr>
+              <td class="text-center">{{x.id}}</td>
+              <td class="text-center hidden-xs">{{x.pertenece}}-{{x.pertenece.Nombre}} {{x.pertenece.Apellido_Paterno}}</td>
+              <td class="text-center">{{x.atiende}}</td>
+              <td class="text-center hidden-xs">{{x.sesion}}</td>
+              <td class="text-center ">{{x.creada}}</td>
+              <td class="text-center hidden-xs">{{x.start_time}}</td>
+              <td class="text-center hidden-xs">{{x.end_time}}</td>
+              <td class="text-center">
+                <div class="btn-group btn-group-md">
+                    <a href="{% url 'class_consulta_detail' x.id %}" title="Detalle de consulta" class=" btn btn-default"><i class="fa fa-eye"></i></a>
+                </div>
+                {% if request.user.is_superuser %}
+                <div class="btn-group btn-group-md">
+                    <a href="{% url 'class_delete_consulta' x.id %}" title="¿Eliminar consulta?" class="btn btn-danger"><i class="fa fa-times"></i></a>
+                </div>
+                {% endif %}
+              </td>
+            </tr>
+        {% endfor %}
+    <tbody>
+    </table>
+            </div>
+        </div>
+    </div>
+
+
+{% else %}
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+        <div class="block">
+            <div class="block-title">
+                    <h2 class="themed-color-fire"><i class="fa fa-exclamation-triangle"></i> <strong>No se encontraron </strong> Consultas</h2>
+                    <div class="block-options pull-right">
+                    </div>
+            </div>
+            <div class="blog-content">
+                <center>
+                <img src="{% static 'website/img/bg-img/gato.png' %}" alt="" style="width:20%;"><br><br>
+                <a  class="btn btn-warning cancelar ml-3" href="javascript:history.back()">Regresar</a>
+                </center>
+            </div>
+            <br>
+        </div>
+    </div>
+    <div class="col-sm-4"></div>
+{% endif %}
+</div>
+
+{% endblock %}
